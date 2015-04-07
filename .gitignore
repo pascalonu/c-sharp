@@ -59,3 +59,15 @@
 *.cache
 *.suo
 *.meta
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+/Temp/
+/Obj/
+/UnityGenerated/
+/ExportedObj/
+*.svd
+*.userprefs
+*.unityproj
