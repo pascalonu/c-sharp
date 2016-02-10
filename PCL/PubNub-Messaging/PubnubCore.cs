@@ -581,8 +581,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+								try
+								{
+	                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+	                                _channelReconnectTimer[channel].Dispose();
+								}
+								catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -606,8 +610,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelReconnectTimer.ContainsKey(channel))
                             {
-                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelReconnectTimer[channel].Dispose();
+								try
+								{
+	                                _channelReconnectTimer[channel].Change(Timeout.Infinite, Timeout.Infinite);
+	                                _channelReconnectTimer[channel].Dispose();
+								}
+								catch { }
                             }
                             switch (netState.Type)
                             {
@@ -669,8 +677,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+								try
+								{
+	                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+	                                _channelGroupReconnectTimer[channelGroup].Dispose();
+								}
+								catch { }
                             }
                             string multiChannel = (netState.Channels != null) ? string.Join(",", netState.Channels) : "";
                             string multiChannelGroup = (netState.ChannelGroups != null) ? string.Join(",", netState.ChannelGroups) : "";
@@ -694,8 +706,12 @@ namespace PubNubMessaging.Core
                         {
                             if (_channelGroupReconnectTimer.ContainsKey(channelGroup))
                             {
-                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
-                                _channelGroupReconnectTimer[channelGroup].Dispose();
+								try
+								{
+	                                _channelGroupReconnectTimer[channelGroup].Change(Timeout.Infinite, Timeout.Infinite);
+	                                _channelGroupReconnectTimer[channelGroup].Dispose();
+								}
+								catch { }
                             }
                             switch (netState.Type)
                             {
@@ -1241,8 +1257,12 @@ namespace PubNubMessaging.Core
         {
             if (presenceHeartbeatTimer != null)
             {
-                presenceHeartbeatTimer.Dispose();
-                presenceHeartbeatTimer = null;
+				try
+				{
+	                presenceHeartbeatTimer.Dispose();
+	                presenceHeartbeatTimer = null;
+				}
+				catch { }
             }
 
         }
