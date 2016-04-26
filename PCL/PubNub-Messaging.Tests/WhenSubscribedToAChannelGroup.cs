@@ -56,17 +56,17 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = unitTest;
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.ChannelGroupGrantAccess(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310*1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess<string>(channelGroupName1, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.ChannelGroupGrantAccess(channelGroupName1, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
             grantManualEvent = new ManualResetEvent(false);
-            pubnub.ChannelGroupGrantAccess<string>(channelGroupName2, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
+            pubnub.ChannelGroupGrantAccess(channelGroupName2, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             grantManualEvent.WaitOne(310 * 1000);
 
@@ -94,21 +94,21 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
             if (receivedChannelGroupMessage)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
-                pubnub.Publish<string>(channelName, "Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyPublishErrorCallback);
+                pubnub.Publish(channelName, "Test for WhenSubscribedToAChannelGroup ThenItShouldReturnReceivedMessage", dummyPublishCallback, DummyPublishErrorCallback);
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
                 mePublish.WaitOne(manualResetEventsWaitTimeout);
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Unsubscribe<string>("", channelGroupName, dummyUnsubscribeCallback, SubscribeConnectCallback, UnsubscribeDummyMethodForDisconnectCallback, DummySubscribeErrorCallback);
+                pubnub.Unsubscribe<string>("", channelGroupName, DummySubscribeErrorCallback);
 
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
                 pubnub.EndPendingRequests(); 
@@ -143,13 +143,13 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, ChannelGroupAddCallback, DummySubscribeErrorCallback);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             if (receivedChannelGroupMessage)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>("", channelGroupName, ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 Thread.Sleep(1000);
 
                 manualResetEventsWaitTimeout = (unitTest.EnableStubTest) ? 1000 : 310 * 1000;
@@ -195,19 +195,19 @@ namespace PubNubMessaging.Tests
             string channel1 = "hello_my_channel1";
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName1 }, channelGroupName1, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.AddChannelsToChannelGroup(new string[] { channelName1 }, channelGroupName1, ChannelGroupAddCallback, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             subscribeManualEvent = new ManualResetEvent(false);
-            pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName2 }, channelGroupName2, ChannelGroupAddCallback, DummySubscribeErrorCallback);
+            pubnub.AddChannelsToChannelGroup(new string[] { channelName2 }, channelGroupName2, ChannelGroupAddCallback, DummySubscribeErrorCallback);
             Thread.Sleep(1000);
             subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
             if (receivedChannelGroupMessage1 && receivedChannelGroupMessage2)
             {
                 subscribeManualEvent = new ManualResetEvent(false);
-                pubnub.Subscribe<string>("", string.Format("{0},{1}", channelGroupName1, channelGroupName2), ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, DummySubscribeErrorCallback);
+                pubnub.Subscribe<string>("", string.Format("{0},{1}", channelGroupName1, channelGroupName2), ReceivedMessageCallbackWhenSubscribed, SubscribeConnectCallback, SubscribeDisconnectCallback, DummySubscribeErrorCallback);
                 subscribeManualEvent.WaitOne(manualResetEventsWaitTimeout);
 
                 pubnub.EndPendingRequests(); 
@@ -222,71 +222,52 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void ReceivedMessageCallbackWhenSubscribed(string result)
+        private void ReceivedMessageCallbackWhenSubscribed(Message<string> result)
         {
             if (currentUnitTestCase == "ThenMultiSubscribeShouldReturnConnectStatus")
             {
                 return;
             }
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            if (result != null && result.Data != null)
             {
-                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
-                if (deserializedMessage != null && deserializedMessage.Count > 0)
-                {
-                    object subscribedObject = (object)deserializedMessage[0];
-                    if (subscribedObject != null)
-                    {
-                        receivedMessage = true;
-                    }
-                }
+                receivedMessage = true;
             }
             subscribeManualEvent.Set();
         }
 
-        void ChannelGroupAddCallback(string receivedMessage)
+        void ChannelGroupAddCallback(AddChannelToChannelGroupAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string serviceType = receivedMessage.Service;
+                    bool errorStatus = receivedMessage.Error;
+                    string currentChannelGroup = receivedMessage.ChannelGroupName.Substring(1); //assuming no namespace for channel group
+                    string statusMessage = receivedMessage.StatusMessage;
+
+                    if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-
-                        if (dictionary != null)
+                        if (currentUnitTestCase == "ThenMultiSubscribeShouldReturnConnectStatus")
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string serviceType = dictionary["service"].ToString();
-                            bool errorStatus = (bool)dictionary["error"];
-                            string currentChannelGroup = serializedMessage[1].ToString().Substring(1); //assuming no namespace for channel group
-                            string statusMessage = dictionary["message"].ToString();
-
-                            if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
+                            if (currentChannelGroup == channelGroupName1)
                             {
-                                if (currentUnitTestCase == "ThenMultiSubscribeShouldReturnConnectStatus")
-                                {
-                                    if (currentChannelGroup == channelGroupName1)
-                                    {
-                                        receivedChannelGroupMessage1 = true;
-                                    }
-                                    else if (currentChannelGroup == channelGroupName2)
-                                    {
-                                        receivedChannelGroupMessage2 = true;
-                                    }
-                                }
-                                else
-                                {
-                                    if (currentChannelGroup == channelGroupName)
-                                    {
-                                        receivedChannelGroupMessage = true;
-                                    }
-                                }
+                                receivedChannelGroupMessage1 = true;
+                            }
+                            else if (currentChannelGroup == channelGroupName2)
+                            {
+                                receivedChannelGroupMessage2 = true;
                             }
                         }
-
+                        else
+                        {
+                            if (currentChannelGroup == channelGroupName)
+                            {
+                                receivedChannelGroupMessage = true;
+                            }
+                        }
                     }
-                    
                 }
             }
             catch { }
@@ -297,41 +278,33 @@ namespace PubNubMessaging.Tests
 
         }
         
-        void SubscribeConnectCallback(string result)
+        void SubscribeConnectCallback(ConnectOrDisconnectAck result)
         {
             if (currentUnitTestCase == "ThenSubscribeShouldReturnConnectStatus")
             {
-                if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
-                {
-                    List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
-                    if (deserializedMessage != null && deserializedMessage.Count > 0)
+                if (result != null)
                     {
-                        long statusCode = Int64.Parse(deserializedMessage[0].ToString());
-                        string statusMessage = (string)deserializedMessage[1];
+                        long statusCode = result.StatusCode;
+                        string statusMessage = result.StatusMessage;
                         if (statusCode == 1 && statusMessage.ToLower() == "connected")
                         {
                             receivedMessage = true;
                         }
                     }
-                }
                 subscribeManualEvent.Set();
             }
             else if (currentUnitTestCase == "ThenMultiSubscribeShouldReturnConnectStatus")
             {
-                if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+                if (result != null)
                 {
-                    List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
-                    if (deserializedMessage != null && deserializedMessage.Count > 0)
+                    long statusCode = result.StatusCode;
+                    string statusMessage = result.StatusMessage;
+                    if (statusCode == 1 && statusMessage.ToLower() == "connected")
                     {
-                        long statusCode = Int64.Parse(deserializedMessage[0].ToString());
-                        string statusMessage = (string)deserializedMessage[1];
-                        if (statusCode == 1 && statusMessage.ToLower() == "connected")
+                        currentCallbackResponses = currentCallbackResponses + 1;
+                        if (expectedCallbackResponses == currentCallbackResponses)
                         {
-                            currentCallbackResponses = currentCallbackResponses + 1;
-                            if (expectedCallbackResponses == currentCallbackResponses)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                     }
                 }
@@ -342,25 +315,21 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void ThenChannelGroupInitializeShouldReturnGrantMessage(string receivedMessage)
+        void SubscribeDisconnectCallback(ConnectOrDisconnectAck receivedMessage)
+        {
+            subscribeManualEvent.Set();
+        }
+
+        void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    var status = receivedMessage.StatusCode;
+                    if (status == 200)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null)
-                        {
-                            var status = dictionary["status"].ToString();
-                            if (status == "200")
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-
+                        receivedGrantMessage = true;
                     }
                 }
             }
@@ -384,9 +353,9 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void dummyPublishCallback(string result)
+        private void dummyPublishCallback(PublishAck result)
         {
-            Console.WriteLine("dummyPublishCallback -> result = " + result);
+            Console.WriteLine("dummyPublishCallback -> result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
             mePublish.Set();
         }
 
@@ -395,12 +364,7 @@ namespace PubNubMessaging.Tests
             mePublish.Set();
         }
 
-        private void dummyUnsubscribeCallback(string result)
-        {
-
-        }
-        
-        void UnsubscribeDummyMethodForDisconnectCallback(string receivedMessage)
+        void UnsubscribeDummyMethodForDisconnectCallback(ConnectOrDisconnectAck receivedMessage)
         {
             subscribeManualEvent.Set();
         }

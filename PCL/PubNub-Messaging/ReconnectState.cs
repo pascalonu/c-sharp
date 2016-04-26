@@ -2,27 +2,30 @@ using System;
 
 namespace PubNubMessaging.Core
 {
-	public class ReconnectState<T>
+	internal class ReconnectState<T>
 	{
 		public string[] Channels;
-        public string[] ChannelGroups;
-		public ResponseType Type;
-		public Action<T> SubscribeOrPresenceRegularCallback;
-        public Action<T> WildcardPresenceCallback;
+		public string[] ChannelGroups;
+		public ResponseType ResponseType;
+		public Action<T> NonSubscribeRegularCallback;
+		public Action<Message<T>> SubscribeRegularCallback;
+		public Action<PresenceAck> PresenceRegularCallback;
+		public Action<ConnectOrDisconnectAck> ConnectCallback;
+		public Action<PresenceAck> WildcardPresenceCallback;
 		public Action<PubnubClientError> ErrorCallback;
-		public Action<T> ConnectCallback;
 		public object Timetoken;
-        public bool Reconnect;
+		public bool Reconnect;
 
 		public ReconnectState()
 		{
 			Channels = null;
-            ChannelGroups = null;
-			SubscribeOrPresenceRegularCallback = null;
-            WildcardPresenceCallback = null;
+			ChannelGroups = null;
+			SubscribeRegularCallback = null;
+			PresenceRegularCallback = null;
+			WildcardPresenceCallback = null;
 			ConnectCallback = null;
 			Timetoken = null;
-            Reconnect = false;
+			Reconnect = false;
 		}
 	}
 }

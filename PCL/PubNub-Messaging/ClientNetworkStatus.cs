@@ -53,7 +53,7 @@ namespace PubNubMessaging.Core
 			}
 		}
 
-		internal static bool CheckInternetStatus<T>(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		internal static bool CheckInternetStatus(bool systemActive, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
 			if (_failClientNetworkForTesting || _machineSuspendMode)
 			{
@@ -62,7 +62,7 @@ namespace PubNubMessaging.Core
 			}
 			else
 			{
-                CheckClientNetworkAvailability<T>(CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
+                CheckClientNetworkAvailability(CallbackClientNetworkStatus, errorCallback, channels, channelGroups);
 				return _status;
 			}
 		}
@@ -81,7 +81,7 @@ namespace PubNubMessaging.Core
         private static object _internetCheckLock = new object();
         private static bool isInternetCheckRunning = false;
 
-		private static void CheckClientNetworkAvailability<T>(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
+		private static void CheckClientNetworkAvailability(Action<bool> callback, Action<PubnubClientError> errorCallback, string[] channels, string[] channelGroups)
 		{
             lock (_internetCheckLock)
             {
@@ -94,19 +94,19 @@ namespace PubNubMessaging.Core
             mres = new ManualResetEvent(false);
 
 
-			InternetState<T> state = new InternetState<T>();
+			InternetState state = new InternetState();
 			state.Callback = callback;
 			state.ErrorCallback = errorCallback;
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
-            ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
+            ThreadPool.QueueUserWorkItem(CheckSocketConnect, state);
 
             mres.WaitOne(500);
 
 		}
 
-		private static void CheckSocketConnect<T>(object internetState)
+		private static void CheckSocketConnect(object internetState)
 		{
             lock (_internetCheckLock)
             {
@@ -121,7 +121,7 @@ namespace PubNubMessaging.Core
 
 			try
 			{
-                InternetState<T> state = internetState as InternetState<T>;
+                InternetState state = internetState as InternetState;
                 if (state != null)
                 {
                     callback = state.Callback;
@@ -149,7 +149,7 @@ namespace PubNubMessaging.Core
 						catch(Exception ex)
 						{
                             _status = false;
-                            ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
+                            ParseCheckSocketConnectException(ex, channels, channelGroups, errorCallback, callback);
                             LoggingMethod.WriteToLog(string.Format("DateTime {0} CheckSocketConnect Failed {1}", DateTime.Now.ToString(), ex.ToString()), LoggingMethod.LevelInfo);
                         }
                         finally
@@ -166,7 +166,7 @@ namespace PubNubMessaging.Core
 			{
 				
 				_status = false;
-				ParseCheckSocketConnectException<T>(ex, channels, channelGroups, errorCallback, callback);
+				ParseCheckSocketConnectException(ex, channels, channelGroups, errorCallback, callback);
 			}
 			finally
 			{
@@ -176,7 +176,7 @@ namespace PubNubMessaging.Core
 		}
 
 
-        static void ParseCheckSocketConnectException<T> (Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
+        static void ParseCheckSocketConnectException(Exception ex, string[] channels, string[] channelGroups, Action<PubnubClientError> errorCallback, Action<bool> callback)
 		{
 			PubnubErrorCode errorType = PubnubErrorCodeHelper.GetErrorType(ex);
 			int statusCode = (int)errorType;

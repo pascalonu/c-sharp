@@ -41,7 +41,7 @@ namespace PubNubMessaging.Tests
             unitTest.TestCaseName = "Init3";
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.ChannelGroupGrantAccess<string>(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.ChannelGroupGrantAccess(channelGroupName, true, true, 20, ThenChannelGroupInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -68,8 +68,8 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
             string channelName = "hello_my_channel";
-            
-            pubnub.AddChannelsToChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
+
+            pubnub.AddChannelsToChannelGroup(new string[] { channelName }, channelGroupName, AddChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -98,7 +98,7 @@ namespace PubNubMessaging.Tests
             channelGroupManualEvent = new ManualResetEvent(false);
             string channelName = "hello_my_channel";
 
-            pubnub.RemoveChannelsFromChannelGroup<string>(new string[] { channelName }, channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
+            pubnub.RemoveChannelsFromChannelGroup(new string[] { channelName }, channelGroupName, RemoveChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -127,7 +127,7 @@ namespace PubNubMessaging.Tests
             channelGroupManualEvent = new ManualResetEvent(false);
             //string channelName = "hello_my_channel";
 
-            pubnub.GetChannelsForChannelGroup<string>(channelGroupName, ChannelGroupCRUDCallback, DummyErrorCallback);
+            pubnub.GetChannelsForChannelGroup(channelGroupName, GetChannelGroupCallback, DummyErrorCallback);
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
@@ -139,55 +139,55 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ChannelGroupCRUDCallback(string receivedMessage)
+        void RemoveChannelGroupCallback(RemoveChannelFromChannelGroupAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string serviceType = receivedMessage.Service;
+                    bool errorStatus = receivedMessage.Error;
+                    string currentChannelGroup = "";
+                    currentChannelGroup = receivedMessage.ChannelGroupName.Substring(1); //assuming no namespace for channel group
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-
-                        if (dictionary != null && dictionary.Count > 0)
+                        if (currentChannelGroup == channelGroupName)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string serviceType = dictionary["service"].ToString();
-                            bool errorStatus = Convert.ToBoolean(dictionary["error"]);
-                            string currentChannelGroup = "";
-                            switch (currentUnitTestCase)
-                            {
-                                case "ThenAddChannelShouldReturnSuccess":
-                                case "ThenRemoveChannelShouldReturnSuccess":
-                                    currentChannelGroup = serializedMessage[1].ToString().Substring(1); //assuming no namespace for channel group
-                                    string statusMessage = dictionary["message"].ToString();
-                                    if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
-                                    {
-                                        if (currentChannelGroup == channelGroupName)
-                                        {
-                                            receivedChannelGroupMessage = true;
-                                        }
-                                    }
-                                    break;
-                                case "ThenGetChannelListShouldReturnSuccess":
-                                    Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                    if (payload != null && payload.Count > 0)
-                                    {
-                                        currentChannelGroup = payload["group"].ToString();
-                                        object[] channels = pubnub.JsonPluggableLibrary.ConvertToObjectArray(payload["channels"]);
-                                        if (currentChannelGroup == channelGroupName && channels != null && channels.Length >= 0)
-                                        {
-                                            receivedChannelGroupMessage = true;
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
+                            receivedChannelGroupMessage = true;
                         }
                     }
-                    
+                }
+
+            }
+            catch { }
+            finally
+            {
+                channelGroupManualEvent.Set();
+            }
+
+        }
+
+        void AddChannelGroupCallback(AddChannelToChannelGroupAck receivedMessage)
+        {
+            try
+            {
+                if (receivedMessage != null)
+                {
+                    int statusCode = receivedMessage.StatusCode;
+                    string serviceType = receivedMessage.Service;
+                    bool errorStatus = receivedMessage.Error;
+                    string currentChannelGroup = receivedMessage.ChannelGroupName.Substring(1); //assuming no namespace for channel group
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "ok" && serviceType == "channel-registry" && !errorStatus)
+                    {
+                        if (currentChannelGroup == channelGroupName)
+                        {
+                            receivedChannelGroupMessage = true;
+                        }
+                    }
+
                 }
             }
             catch { }
@@ -198,25 +198,47 @@ namespace PubNubMessaging.Tests
 
         }
 
-        void ThenChannelGroupInitializeShouldReturnGrantMessage(string receivedMessage)
+        void GetChannelGroupCallback(GetChannelGroupChannelsAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string serviceType = receivedMessage.Service;
+                    bool errorStatus = receivedMessage.Error;
+                    string currentChannelGroup = "";
+                    GetChannelGroupChannelsAck.Data payload = receivedMessage.Payload;
+                    if (payload != null)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null)
+                        currentChannelGroup = payload.ChannelGroupName;
+                        string[] channels = payload.ChannelName;
+                        if (currentChannelGroup == channelGroupName && channels != null && channels.Length >= 0)
                         {
-                            var status = dictionary["status"].ToString();
-                            if (status == "200")
-                            {
-                                receivedGrantMessage = true;
-                            }
+                            receivedChannelGroupMessage = true;
                         }
+                    }
 
+                }
+            }
+            catch { }
+            finally
+            {
+                channelGroupManualEvent.Set();
+            }
+
+        }
+        
+        void ThenChannelGroupInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
+        {
+            try
+            {
+                if (receivedMessage != null)
+                {
+                    var status = receivedMessage.StatusCode;
+                    if (status == 200)
+                    {
+                        receivedGrantMessage = true;
                     }
                 }
             }

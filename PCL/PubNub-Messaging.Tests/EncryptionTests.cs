@@ -180,9 +180,7 @@ namespace PubNubMessaging.Tests
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
             //deserialize again
-			int same = string.Compare ("yay!", decryptedMessage, StringComparison.InvariantCulture);
-			Assert.IsTrue(same == 0);
-            //Assert.AreEqual("yay!", decryptedMessage);
+            Assert.AreEqual("yay!", decryptedMessage);
         }
 
         /// <summary>
@@ -276,9 +274,8 @@ namespace PubNubMessaging.Tests
             //create a serialized object
             object[] emptyArrayObject = { };
             string result = JsonConvert.SerializeObject(emptyArrayObject);
-			int same = String.Compare(result, decryptedMessage, StringComparison.InvariantCulture);
             //compare the serialized object and the return of the Decrypt method
-			Assert.IsTrue(same == 0);
+            Assert.AreEqual(result, decryptedMessage);
         }
 
         /// <summary>
@@ -318,8 +315,7 @@ namespace PubNubMessaging.Tests
             //Serialize the object
             string result = JsonConvert.SerializeObject(obj);
 
-			int same = string.Compare (result, decryptedMessage, StringComparison.InvariantCulture);
-			Assert.IsTrue(same == 0);
+            Assert.AreEqual(result, decryptedMessage);
         }
         /// <summary>
         /// Tests my object encryption.
@@ -357,8 +353,7 @@ namespace PubNubMessaging.Tests
             //Serialize it
             string result = JsonConvert.SerializeObject(cc);
 
-			int same = string.Compare (result, decryptedMessage, StringComparison.InvariantCulture);
-			Assert.IsTrue(same == 0);
+            Assert.AreEqual(result, decryptedMessage);
         }
 
         /// <summary>
@@ -465,9 +460,7 @@ namespace PubNubMessaging.Tests
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
 
-			int same = string.Compare ("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage, StringComparison.InvariantCulture);
-			Assert.IsTrue(same == 0);
-            //Assert.AreEqual("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage);
+            Assert.AreEqual("{\"this stuff\":{\"can get\":\"complicated!\"}}", decryptedMessage);
         }
 
         /// <summary>
@@ -499,10 +492,8 @@ namespace PubNubMessaging.Tests
             string message = "GsvkCYZoYylL5a7/DKhysDjNbwn+BtBtHj2CvzC4Y4g=";
             //decrypt
             string decryptedMessage = pc.Decrypt(message);
-			string expectedMessage = "{\"foo\":{\"bar\":\"foobar\"}}";
-			int same = string.Compare(expectedMessage, decryptedMessage, StringComparison.InvariantCulture);
 
-			Assert.IsTrue(same == 0);
+            Assert.AreEqual("{\"foo\":{\"bar\":\"foobar\"}}", decryptedMessage);
         }
 
         /// <summary>

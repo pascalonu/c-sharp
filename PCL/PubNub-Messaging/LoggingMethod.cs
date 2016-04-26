@@ -166,7 +166,7 @@ namespace PubNubMessaging.Core
 			_errorSeverity = errorSeverity;
 			_messageSource = source;
 			_channel = channel;
-			_channelGroup = channelGroup;
+            _channelGroup = channelGroup;
 			_detailedDotNetException = null;
 			_pubnubWebRequest = pubnubWebRequest;
 			_pubnubWebResponse = pubnubWebResponse;
@@ -447,12 +447,12 @@ namespace PubNubMessaging.Core
             {
                 ret = PubnubErrorCode.NameResolutionFailure;
             }
-            else
-            {
-                //Console.WriteLine("ATTENTION: Error Type = " + errorType);
-                //Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
-                ret = PubnubErrorCode.None;
-            }
+			else
+			{
+				//Console.WriteLine("ATTENTION: Error Type = " + errorType);
+				//Console.WriteLine("ATTENTION: Error Message = " + errorMessage);
+				ret = PubnubErrorCode.None;
+			}
 			return ret;
 		}
 
@@ -648,8 +648,8 @@ namespace PubNubMessaging.Core
 			dictionaryCodes.Add(115, "Protocol Error. Please contact PubNub with log, use-case, and error details.");
 			dictionaryCodes.Add(116, "ServerProtocolViolation. Please contact PubNub with error details.");
 			dictionaryCodes.Add(117, "Input contains invalid channel name");
-			dictionaryCodes.Add(118, "Channel not subscribed yet");
-			dictionaryCodes.Add(119, "Channel not subscribed for presence yet");
+			dictionaryCodes.Add(118, "Channel or ChannelGroup not subscribed yet");
+            dictionaryCodes.Add(119, "Channel or ChannelGroup not subscribed for presence yet");
 			dictionaryCodes.Add(120, "Incomplete unsubscribe. Try again for unsubscribe.");
 			dictionaryCodes.Add(121, "Incomplete presence-unsubscribe. Try again for presence-unsubscribe.");
 			dictionaryCodes.Add(122, "Network/Internet connection not available. C# client retrying again to verify connection. No action is needed from your side.");

@@ -43,7 +43,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.GrantAccess<string>(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
+            pubnub.GrantAccess(channel, true, true, 20, ThenUnsubscribeInitializeShouldReturnGrantMessage, DummyErrorCallback);
             Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -68,7 +68,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Unsubscribe<string>(channel, DummyMethodNoExistChannelUnsubscribeChannelUserCallback, DummyMethodNoExistChannelUnsubscribeChannelConnectCallback, DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1, NoExistChannelErrorCallback);
+            pubnub.Unsubscribe<string>(channel, NoExistChannelErrorCallback);
 
             meNotSubscribed.WaitOne();
 
@@ -95,12 +95,12 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
 
-            pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyErrorCallback);
+            pubnub.Subscribe<string>(channel, DummyMethodChannelSubscribeUserCallback, DummyMethodChannelSubscribeConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback);
             meChannelSubscribed.WaitOne();
 
             if (receivedChannelConnectedMessage)
             {
-                pubnub.Unsubscribe<string>(channel, DummyMethodUnsubscribeChannelUserCallback, DummyMethodUnsubscribeChannelConnectCallback, DummyMethodUnsubscribeChannelDisconnectCallback, DummyErrorCallback);
+                pubnub.Unsubscribe<string>(channel, DummyErrorCallback);
                 meChannelUnsubscribed.WaitOne();
             }
 
@@ -111,26 +111,18 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedUnsubscribedMessage, "WhenUnsubscribedToAChannel --> ThenShouldReturnUnsubscribedMessage Failed");
         }
 
-        void ThenUnsubscribeInitializeShouldReturnGrantMessage(string receivedMessage)
+        void ThenUnsubscribeInitializeShouldReturnGrantMessage(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    var status = receivedMessage.StatusCode;
+                    if (status == 200)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null)
-                        {
-                            var status = dictionary["status"].ToString();
-                            if (status == "200")
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-
+                        receivedGrantMessage = true;
                     }
+
                 }
             }
             catch { }
@@ -140,13 +132,13 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        private void DummyMethodChannelSubscribeUserCallback(string result)
+        private void DummyMethodChannelSubscribeUserCallback(Message<string> result)
         {
         }
 
-        private void DummyMethodChannelSubscribeConnectCallback(string result)
+        private void DummyMethodChannelSubscribeConnectCallback(ConnectOrDisconnectAck result)
         {
-            if (result.Contains("Connected"))
+            if (result.StatusMessage.Contains("Connected"))
             {
                 receivedChannelConnectedMessage = true;
             }
@@ -157,13 +149,13 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        private void DummyMethodUnsubscribeChannelConnectCallback(string result)
+        private void DummyMethodUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
         {
         }
 
-        private void DummyMethodUnsubscribeChannelDisconnectCallback(string result)
+        private void DummyMethodUnsubscribeChannelDisconnectCallback(ConnectOrDisconnectAck result)
         {
-            if (result.Contains("Unsubscribed from"))
+            if (result.StatusMessage.Contains("Unsubscribed from"))
             {
                 receivedUnsubscribedMessage = true;
             }
@@ -174,11 +166,11 @@ namespace PubNubMessaging.Tests
         {
         }
 
-        private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(string result)
+        private void DummyMethodNoExistChannelUnsubscribeChannelConnectCallback(ConnectOrDisconnectAck result)
         {
         }
 
-        private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(string result)
+        private void DummyMethodNoExistChannelUnsubscribeChannelDisconnectCallback1(ConnectOrDisconnectAck result)
         {
         }
 
