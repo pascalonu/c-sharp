@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 30, 2016
+﻿//Build Date: Apr 26, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -2339,6 +2339,10 @@ namespace PubNubMessaging.Core
             {
                 url.Add("remove");
             }
+            else if (!nameSpaceAvailable && groupNameAvailable && !channelAvaiable)  
+            {  
+                url.Add("remove"); 
+            }  
 
             return BuildRestApiRequest<Uri>(url, ResponseType.ChannelGroupRemove);
         }
@@ -9047,24 +9051,25 @@ namespace PubNubMessaging.Core
                         ack.StatusCode = statusCode;
 
                     ack.Service = removeCgDicObj["service"].ToString();
+                    ack.StatusMessage = removeCgDicObj["message"].ToString();
 
-                    Dictionary<string, object> removeCgPayloadDic = ConvertToDictionaryObject(removeCgDicObj["payload"]);
-                    if (removeCgPayloadDic != null && removeCgPayloadDic.Count > 0)
-                    {
-                        ack.Payload = new RemoveChannelGroupAck.Data();
-                        ack.Payload.ChannelGroupName = removeCgPayloadDic["group"].ToString();
+                    //Dictionary<string, object> removeCgPayloadDic = ConvertToDictionaryObject(removeCgDicObj["payload"]);
+                    //if (removeCgPayloadDic != null && removeCgPayloadDic.Count > 0)
+                    //{
+                    //    ack.Payload = new RemoveChannelGroupAck.Data();
+                    //    ack.Payload.ChannelGroupName = removeCgPayloadDic["group"].ToString();
 
-                        object[] cgChPayloadChannels = ConvertToObjectArray(removeCgPayloadDic["channels"]);
-                        if (cgChPayloadChannels != null && cgChPayloadChannels.Length > 0)
-                        {
-                            List<string> chList = new List<string>();
-                            for (int index = 0; index < cgChPayloadChannels.Length; index++)
-                            {
-                                chList.Add(cgChPayloadChannels[index].ToString());
-                            }
-                            ack.Payload.ChannelName = chList.ToArray();
-                        }
-                    }
+                    //    object[] cgChPayloadChannels = ConvertToObjectArray(removeCgPayloadDic["channels"]);
+                    //    if (cgChPayloadChannels != null && cgChPayloadChannels.Length > 0)
+                    //    {
+                    //        List<string> chList = new List<string>();
+                    //        for (int index = 0; index < cgChPayloadChannels.Length; index++)
+                    //        {
+                    //            chList.Add(cgChPayloadChannels[index].ToString());
+                    //        }
+                    //        ack.Payload.ChannelName = chList.ToArray();
+                    //    }
+                    //}
 
                     ack.Error = Convert.ToBoolean(removeCgDicObj["error"].ToString());
                 }
@@ -9933,24 +9938,26 @@ namespace PubNubMessaging.Core
 
     public class RemoveChannelGroupAck
     {
-        public class Data
-        {
-            public Data()
-            {
-                this.ChannelGroupName = "";
-            }
+        //public class Data
+        //{
+        //    public Data()
+        //    {
+        //        this.ChannelGroupName = "";
+        //    }
 
-            public string[] ChannelName;
-            public string ChannelGroupName;
-        }
+        //    public string[] ChannelName;
+        //    public string ChannelGroupName;
+        //}
 
         public RemoveChannelGroupAck()
         {
+            this.StatusMessage = "";
             this.Service = "";
         }
 
         public int StatusCode { get; set; }
-        public Data Payload { get; set; }
+        public string StatusMessage { get; set; }
+        //public Data Payload { get; set; }
         public string Service { get; set; }
         public bool Error { get; set; }
     }
