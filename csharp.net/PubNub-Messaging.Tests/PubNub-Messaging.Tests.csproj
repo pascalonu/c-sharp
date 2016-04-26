@@ -81,6 +81,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\NUnit 2.6.1\bin\framework\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Threading">
       <HintPath>v3.5\System.Threading.dll</HintPath>
     </Reference>
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanupGrant.cs" />
+    <Compile Include="CustomGenerics.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="GenerateSampleGrant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,7 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PubNub-Messaging\PubNub-Messaging.csproj">
-      <Project>{B1ED98C3-FD0B-4B45-B0BE-40AFD37182CB}</Project>
+      <Project>{b1ed98c3-fd0b-4b45-b0be-40afd37182cb}</Project>
       <Name>PubNub-Messaging</Name>
     </ProjectReference>
   </ItemGroup>

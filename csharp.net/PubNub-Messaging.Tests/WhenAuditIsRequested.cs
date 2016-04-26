@@ -37,7 +37,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess<string>(AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess(AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.AuditAccess<string>(channel, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.AuditAccess(channel, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -108,7 +108,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 auditManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupAuditAccess<string>(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.ChannelGroupAuditAccess(channelgroup, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 auditManualEvent.WaitOne();
@@ -124,42 +124,31 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToSubKeyLevelCallback(string receivedMessage)
+        void AccessToSubKeyLevelCallback(AuditAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-
-                        if (dictionary != null && dictionary.Count > 0)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            if (channels != null && channels.Count >= 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
-                                {
-                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                    if (channels != null && channels.Count >= 0)
-                                    {
-                                        Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
-                                    }
-                                    string level = payload["level"].ToString();
-                                    if (level == "subkey")
-                                    {
-                                        receivedAuditMessage = true;
-                                    }
-                                }
+                                Console.WriteLine("{0} - AccessToSubKeyLevelCallback - Audit Count = {1}", currentUnitTestCase, channels.Count);
                             }
-
+                            string level = receivedMessage.Payload.Level;
+                            if (level == "subkey")
+                            {
+                                receivedAuditMessage = true;
+                            }
                         }
                     }
-                    
+
                 }
             }
             catch { }
@@ -169,59 +158,45 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToChannelLevelCallback(string receivedMessage)
+        void AccessToChannelLevelCallback(AuditAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        string currentChannel = serializedMessage[1].ToString();
-                        
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            string level = receivedMessage.Payload.Level;
+                            if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                                if (channels != null && channels.Count >= 0)
                                 {
-                                    string level = payload["level"].ToString();
-                                    if (currentUnitTestCase == "ThenChannelLevelShouldReturnSuccess")
-                                    {
-                                        Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                        if (channels != null && channels.Count >= 0)
-                                        {
-                                            Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
-                                        }
-                                        if (level == "channel")
-                                        {
-                                            receivedAuditMessage = true;
-                                        }
-                                    }
-                                    else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
-                                    {
-                                        Dictionary<string, object> channelgroups = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channel-groups"]);
-                                        if (channelgroups != null && channelgroups.Count >= 0)
-                                        {
-                                            Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
-                                        }
-                                        if (level == "channel-group")
-                                        {
-                                            receivedAuditMessage = true;
-                                        }
-                                    }
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit Channel Count = {1}", currentUnitTestCase, channels.Count);
+                                }
+                                if (level == "channel")
+                                {
+                                    receivedAuditMessage = true;
+                                }
+                            }
+                            else if (currentUnitTestCase == "ThenChannelGroupLevelShouldReturnSuccess")
+                            {
+                                Dictionary<string, AuditAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
+                                if (channelgroups != null && channelgroups.Count >= 0)
+                                {
+                                    Console.WriteLine("{0} - AccessToChannelLevelCallback - Audit ChannelGroup Count = {1}", currentUnitTestCase, channelgroups.Count);
+                                }
+                                if (level == "channel-group")
+                                {
+                                    receivedAuditMessage = true;
                                 }
                             }
                         }
                     }
-                    
-                    
-                    
                 }
             }
             catch { }

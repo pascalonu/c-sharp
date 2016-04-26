@@ -37,7 +37,7 @@ namespace PubNubMessaging.Tests
                 auditManualEvent = new ManualResetEvent(false);
 
                 pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
+                pubnub.AuditAccess(UserCallbackForCleanUpAccessAtUserLevel, ErrorCallbackForCleanUpAccessAtUserLevel);
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
@@ -65,7 +65,7 @@ namespace PubNubMessaging.Tests
                 auditManualEvent = new ManualResetEvent(false);
 
                 pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                pubnub.AuditAccess<string>(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
+                pubnub.AuditAccess(UserCallbackForCleanUpAccessAtChannelLevel, ErrorCallbackForCleanUpAccessAtChannelLevel);
                 auditManualEvent.WaitOne();
 
                 pubnub.EndPendingRequests();
@@ -78,62 +78,51 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void UserCallbackForCleanUpAccessAtUserLevel(string receivedMessage)
+        void UserCallbackForCleanUpAccessAtUserLevel(AuditAck receivedMessage)
         {
             try
             {
-                Console.WriteLine(receivedMessage);
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage));
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null && dictionary.Count > 0)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            if (channels != null && channels.Count > 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
+                                foreach (string channelName in channels.Keys)
                                 {
-                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                    if (channels != null && channels.Count > 0)
+                                    AuditAck.Data.ChannelData channelContainer = channels[channelName];
+                                    if (channelContainer != null && channelContainer.auths != null)
                                     {
-                                        Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
-                                        foreach (string channelName in channels.Keys)
+                                        Dictionary<string, AuditAck.Data.ChannelData.AuthData> auths = channelContainer.auths;
+                                        if (auths != null && auths.Count > 0)
                                         {
-                                            Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
-                                            if (channelContainer != null && channelContainer.Count > 0 && channelContainer.ContainsKey("auths"))
+                                            foreach (string authKey in auths.Keys)
                                             {
-                                                Dictionary<string, object> auths = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channelContainer["auths"]);
-                                                if (auths != null && auths.Count > 0)
-                                                {
-                                                    foreach (string authKey in auths.Keys)
-                                                    {
-                                                        receivedRevokeMessage = false;
-                                                        Console.WriteLine("Auth Key = " + authKey);
-                                                        pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                                        pubnub.GrantAccess<string>(channelName, authKey, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                                        revokeManualEvent.WaitOne();
+                                                receivedRevokeMessage = false;
+                                                Console.WriteLine("Auth Key = " + authKey);
+                                                pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                                pubnub.GrantAccess(channelName, authKey, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                                revokeManualEvent.WaitOne();
 
-                                                    }
-                                                }
                                             }
                                         }
                                     }
-                                    string level = payload["level"].ToString();
-                                    if (level == "subkey")
-                                    {
-                                        receivedAuditMessage = true;
-                                    }
                                 }
+                            }
+                            string level = receivedMessage.Payload.Level;
+                            if (level == "subkey")
+                            {
+                                receivedAuditMessage = true;
                             }
                         }
                     }
-
-                    
                 }
             }
             catch { }
@@ -152,11 +141,11 @@ namespace PubNubMessaging.Tests
             auditManualEvent.Set();
         }
 
-        void UserCallbackForRevokeAccess(string receivedMessage)
+        void UserCallbackForRevokeAccess(GrantAck receivedMessage)
         {
             if (receivedMessage != null)
             {
-                Console.WriteLine(receivedMessage);
+                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage));
                 receivedRevokeMessage = true;
             }
             revokeManualEvent.Set();
@@ -171,67 +160,56 @@ namespace PubNubMessaging.Tests
             revokeManualEvent.Set();
         }
 
-        void UserCallbackForCleanUpAccessAtChannelLevel(string receivedMessage)
+        void UserCallbackForCleanUpAccessAtChannelLevel(AuditAck receivedMessage)
         {
             try
             {
-                Console.WriteLine(receivedMessage);
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(receivedMessage));
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        if (dictionary != null && dictionary.Count > 0)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            Dictionary<string, AuditAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            if (channels != null && channels.Count > 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
+                                foreach (string channelName in channels.Keys)
                                 {
-                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                    if (channels != null && channels.Count > 0)
-                                    {
-                                        Console.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Count);
-                                        foreach (string channelName in channels.Keys)
-                                        {
-                                            //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
-                                            Console.WriteLine(channelName);
-                                            pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                            revokeManualEvent.WaitOne();
+                                    //Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[channelName]);
+                                    Console.WriteLine(channelName);
+                                    pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                    pubnub.GrantAccess(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                    revokeManualEvent.WaitOne();
 
-                                        }
-                                        //foreach (JToken channel in channels.Children())
-                                        //{
-                                        //    if (channel is JProperty)
-                                        //    {
-                                        //        var channelProperty = channel as JProperty;
-                                        //        if (channelProperty != null)
-                                        //        {
-                                        //            string channelName = channelProperty.Name;
-                                        //            Console.WriteLine(channelName);
-                                        //            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
-                                        //            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
-                                        //            revokeManualEvent.WaitOne();
-                                        //        }
-                                        //    }
-                                        //}
-                                    }
-                                    string level = payload["level"].ToString();
-                                    if (level == "subkey")
-                                    {
-                                        receivedAuditMessage = true;
-                                    }
                                 }
+                                //foreach (JToken channel in channels.Children())
+                                //{
+                                //    if (channel is JProperty)
+                                //    {
+                                //        var channelProperty = channel as JProperty;
+                                //        if (channelProperty != null)
+                                //        {
+                                //            string channelName = channelProperty.Name;
+                                //            Console.WriteLine(channelName);
+                                //            Pubnub pubnub = new Pubnub(PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, PubnubCommon.SecretKey, "", false);
+                                //            pubnub.GrantAccess<string>(channelName, false, false, UserCallbackForRevokeAccess, ErrorCallbackForRevokeAccess);
+                                //            revokeManualEvent.WaitOne();
+                                //        }
+                                //    }
+                                //}
                             }
-
+                            string level = receivedMessage.Payload.Level;
+                            if (level == "subkey")
+                            {
+                                receivedAuditMessage = true;
+                            }
                         }
                     }
-                    
-                    
+
                 }
             }
             catch { }

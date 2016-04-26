@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess("", true, false, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -106,7 +106,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess("", false, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -140,7 +140,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -174,7 +174,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -208,7 +208,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, false, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -243,7 +243,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -278,7 +278,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, authKey, true, false, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -313,7 +313,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, authKey, false, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -368,7 +368,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, true, true, 5, AccessToMultiChannelGrantCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -424,7 +424,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.GrantAccess<string>(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
+                pubnub.GrantAccess(channel, auth, true, true, 5, AccessToMultiAuthGrantCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -459,7 +459,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess<string>("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess("", true, true, 5, AccessToSubKeyLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -471,7 +471,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtSubKeyLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess("", false, false, 5, RevokeToSubKeyLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
                     
@@ -512,7 +512,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess<string>(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess(channel, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne(310*1000);
                 }
@@ -524,7 +524,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtChannelLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>("", false, false, 5, RevokeToChannelLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess(channel, false, false, RevokeToChannelLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -566,7 +566,7 @@ namespace PubNubMessaging.Tests
                 if (!unitTest.EnableStubTest)
                 {
                     grantManualEvent = new ManualResetEvent(false);
-                    pubnub.GrantAccess<string>(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess(channel, authKey, true, true, 5, AccessToUserLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     grantManualEvent.WaitOne();
                 }
@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
                 {
                     revokeManualEvent = new ManualResetEvent(false);
                     Console.WriteLine("WhenGrantIsRequested -> ThenRevokeAtUserLevelReturnSuccess -> Grant ok..Now trying Revoke");
-                    pubnub.GrantAccess<string>(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
+                    pubnub.GrantAccess(channel, authKey, false, false, 5, RevokeToUserLevelCallback, DummyErrorCallback);
                     Thread.Sleep(1000);
                     revokeManualEvent.WaitOne();
 
@@ -616,7 +616,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.ChannelGroupGrantAccess(channelgroup, true, true, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -650,7 +650,7 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMEnabled)
             {
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.ChannelGroupGrantAccess<string>(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
+                pubnub.ChannelGroupGrantAccess(channelgroup, true, false, 5, AccessToChannelLevelCallback, DummyErrorCallback);
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
@@ -667,41 +667,84 @@ namespace PubNubMessaging.Tests
         }
 
 
-        void AccessToSubKeyLevelCallback(string receivedMessage)
+        void AccessToSubKeyLevelCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-
-                        if (dictionary != null && dictionary.Count > 0)
+                        if (receivedMessage.Payload != null && receivedMessage.Payload.Access != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            bool read = receivedMessage.Payload.Access.read;
+                            bool write = receivedMessage.Payload.Access.write;
+                            string level = receivedMessage.Payload.Level;
+                            if (level == "subkey")
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                switch (currentUnitTestCase)
                                 {
-                                    bool read = Convert.ToBoolean(payload["r"]);
-                                    bool write = Convert.ToBoolean(payload["w"]);
-                                    string level = payload["level"].ToString();
-                                    if (level == "subkey")
+                                    case "ThenSubKeyLevelWithReadWriteShouldReturnSuccess":
+                                    case "ThenRevokeAtSubKeyLevelReturnSuccess":
+                                        if (read && write) receivedGrantMessage = true;
+                                        break;
+                                    case "ThenSubKeyLevelWithReadShouldReturnSuccess":
+                                        if (read && !write) receivedGrantMessage = true;
+                                        break;
+                                    case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
+                                        if (!read && write) receivedGrantMessage = true;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
+        }
+
+        void AccessToChannelLevelCallback(GrantAck receivedMessage)
+        {
+            try
+            {
+                
+                if (receivedMessage != null)
+                {
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                    {
+                        if (receivedMessage.Payload != null)
+                        {
+                            string level = receivedMessage.Payload.Level;
+                            if (level == "channel")
+                            {
+                                Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                                if (channels != null && channels.Count > 0)
+                                {
+                                    string currentChannel = channels.Keys.ToList()[0];
+                                    if (channels[currentChannel].Access != null)
                                     {
+                                        bool read = channels[currentChannel].Access.read;
+                                        bool write = channels[currentChannel].Access.write;
                                         switch (currentUnitTestCase)
                                         {
-                                            case "ThenSubKeyLevelWithReadWriteShouldReturnSuccess":
-                                            case "ThenRevokeAtSubKeyLevelReturnSuccess":
+                                            case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
+                                            case "ThenRevokeAtChannelLevelReturnSuccess":
                                                 if (read && write) receivedGrantMessage = true;
                                                 break;
-                                            case "ThenSubKeyLevelWithReadShouldReturnSuccess":
+                                            case "ThenChannelLevelWithReadShouldReturnSuccess":
                                                 if (read && !write) receivedGrantMessage = true;
                                                 break;
-                                            case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
+                                            case "ThenChannelLevelWithWriteShouldReturnSuccess":
                                                 if (!read && write) receivedGrantMessage = true;
                                                 break;
                                             default:
@@ -710,98 +753,32 @@ namespace PubNubMessaging.Tests
                                     }
                                 }
                             }
-                        }
-                    }
-                    
-                    
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void AccessToChannelLevelCallback(string receivedMessage)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
-                {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
-                    {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-                        if (dictionary != null)
-                        {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            else if (level == "channel-group")
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                Dictionary<string, GrantAck.Data.ChannelGroupData> channelgroups = receivedMessage.Payload.channelgroups;
+                                if (channelgroups != null && channelgroups.Count > 0)
                                 {
-                                    string level = payload["level"].ToString();
-                                    if (level == "channel")
+                                    string currentChannelGroup = channelgroups.Keys.ToList()[0];
+                                    if (channelgroups[currentChannelGroup].Access != null)
                                     {
-                                        Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                        if (channels != null && channels.Count > 0)
+                                        bool read = channelgroups[currentChannelGroup].Access.read;
+                                        bool manage = channelgroups[currentChannelGroup].Access.manage;
+                                        switch (currentUnitTestCase)
                                         {
-                                            Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[currentChannel]);
-                                            if (channelContainer != null && channelContainer.Count > 0)
-                                            {
-                                                bool read = Convert.ToBoolean(channelContainer["r"]);
-                                                bool write = Convert.ToBoolean(channelContainer["w"]);
-                                                switch (currentUnitTestCase)
-                                                {
-                                                    case "ThenChannelLevelWithReadWriteShouldReturnSuccess":
-                                                    case "ThenRevokeAtChannelLevelReturnSuccess":
-                                                        if (read && write) receivedGrantMessage = true;
-                                                        break;
-                                                    case "ThenChannelLevelWithReadShouldReturnSuccess":
-                                                        if (read && !write) receivedGrantMessage = true;
-                                                        break;
-                                                    case "ThenChannelLevelWithWriteShouldReturnSuccess":
-                                                        if (!read && write) receivedGrantMessage = true;
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                            }
+                                            case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
+                                                if (read && manage) receivedGrantMessage = true;
+                                                break;
+                                            case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
+                                                if (read && !manage) receivedGrantMessage = true;
+                                                break;
+                                            default:
+                                                break;
                                         }
                                     }
-                                    else if (level == "channel-group")
-                                    {
-                                        Dictionary<string, object> channelgroups = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channel-groups"]);
-                                        if (channelgroups != null && channelgroups.Count > 0)
-                                        {
-                                            Dictionary<string, object> channelgroupContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channelgroups[currentChannel]);
-                                            if (channelgroupContainer != null && channelgroupContainer.Count > 0)
-                                            {
-                                                bool read = Convert.ToBoolean(channelgroupContainer["r"]);
-                                                bool manage = Convert.ToBoolean(channelgroupContainer["m"]);
-                                                switch (currentUnitTestCase)
-                                                {
-                                                    case "ThenChannelGroupLevelWithReadManageShouldReturnSuccess":
-                                                        if (read && manage) receivedGrantMessage = true;
-                                                        break;
-                                                    case "ThenChannelGroupLevelWithReadShouldReturnSuccess":
-                                                        if (read && !manage) receivedGrantMessage = true;
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    } //end of if
                                 }
-                            }
+                            } //end of if
                         }
                     }
-                    
-                    
                 }
             }
             catch { }
@@ -811,40 +788,35 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToUserLevelCallback(string receivedMessage)
+        void AccessToUserLevelCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-                        if (dictionary != null)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            string level = receivedMessage.Payload.Level;
+                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            foreach (string channel in channels.Keys)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                GrantAck.Data.ChannelData channelData = channels[channel];
+                                if (channelData.auths != null)
                                 {
-                                    string level = payload["level"].ToString();
-                                    string channel = payload["channel"].ToString();
-
-                                    Dictionary<string, object> auths = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["auths"]);
-                                    
-                                    if (auths != null && auths.Count >= 0)
+                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
+                                    if (authDataDic != null)
                                     {
-                                        foreach (string key in auths.Keys)
+                                        foreach (string key in authDataDic.Keys)
                                         {
-                                            Dictionary<string, object> authKeyContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(auths[key]);
-                                            if (authKeyContainer != null && authKeyContainer.Count > 0)
+                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
+                                            if (authData != null && authData.Access != null)
                                             {
-                                                bool read = Convert.ToBoolean(authKeyContainer["r"]);
-                                                bool write = Convert.ToBoolean(authKeyContainer["w"]);
+                                                bool read = authData.Access.read;
+                                                bool write = authData.Access.write;
                                                 if (level == "user")
                                                 {
                                                     switch (currentUnitTestCase)
@@ -863,16 +835,14 @@ namespace PubNubMessaging.Tests
                                                             break;
                                                     }
                                                 }
-
                                             }
                                         }
                                     }
-                                
                                 }
                             }
+
                         }
                     }
-                    
                 }
             }
             catch { }
@@ -882,36 +852,65 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToMultiChannelGrantCallback(string receivedMessage)
+        void AccessToMultiChannelGrantCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-
-                        if (dictionary != null)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            string level = receivedMessage.Payload.Level;
+                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            if (channels != null && channels.Count >= 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
+                                if (channels.Count == multipleChannelGrantCount)
                                 {
-                                    string level = payload["level"].ToString();
-                                    Dictionary<string, object> channels = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]);
-                                    if (channels != null && channels.Count >= 0)
+                                    receivedGrantMessage = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                grantManualEvent.Set();
+            }
+        }
+
+        void AccessToMultiAuthGrantCallback(GrantAck receivedMessage)
+        {
+            try
+            {
+                if (receivedMessage != null)
+                {
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
+                    {
+                        if (receivedMessage.Payload != null)
+                        {
+                            string level = receivedMessage.Payload.Level;
+                            Dictionary<string, GrantAck.Data.ChannelData> channelsData = receivedMessage.Payload.channels;
+                            if (channelsData != null && channelsData.Count > 0)
+                            {
+                                List<string> channels = channelsData.Keys.ToList();
+                                string channel = channels[0];
+                                //string channel = 
+                                GrantAck.Data.ChannelData channelData = channelsData[channel];
+                                if (channelData != null && channelData.auths != null)
+                                {
+                                    Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channelData.auths.Count, multipleAuthGrantCount);
+                                    if (channelData.auths.Count == multipleAuthGrantCount)
                                     {
-                                        Console.WriteLine("{0} - AccessToMultiChannelGrantCallback - Grant MultiChannel Count (Received/Sent) = {1}/{2}", currentUnitTestCase, channels.Count, multipleChannelGrantCount);
-                                        if (channels.Count == multipleChannelGrantCount)
-                                        {
-                                            receivedGrantMessage = true;
-                                        }
+                                        receivedGrantMessage = true;
                                     }
                                 }
                             }
@@ -926,99 +925,37 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void AccessToMultiAuthGrantCallback(string receivedMessage)
+        void RevokeToSubKeyLevelCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                int statusCode = receivedMessage.StatusCode;
+                string statusMessage = receivedMessage.StatusMessage;
+                if (statusCode == 200 && statusMessage.ToLower() == "success")
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    if (receivedMessage.Payload != null && receivedMessage.Payload.Access != null)
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-
-                        if (dictionary != null)
+                        bool read = receivedMessage.Payload.Access.read;
+                        bool write = receivedMessage.Payload.Access.write;
+                        string level = receivedMessage.Payload.Level;
+                        if (level == "subkey")
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            switch (currentUnitTestCase)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null)
-                                {
-                                    string level = payload["level"].ToString();
-                                    string channel = payload["channel"].ToString();
-
-                                    Dictionary<string, object> auths = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["auths"]);
-                                    if (auths != null && auths.Count >= 0)
-                                    {
-                                        Console.WriteLine("{0} - AccessToMultiAuthGrantCallback - Grant Auth Count (Received/Sent) = {1}/{2}", currentUnitTestCase, auths.Count, multipleAuthGrantCount);
-                                        if (auths.Count == multipleAuthGrantCount)
-                                        {
-                                            receivedGrantMessage = true;
-                                        }
-                                    }
-                                }
+                                case "ThenRevokeAtSubKeyLevelReturnSuccess":
+                                    if (!read && !write) receivedRevokeMessage = true;
+                                    break;
+                                case "ThenSubKeyLevelWithReadShouldReturnSuccess":
+                                    //if (read && !write) receivedGrantMessage = true;
+                                    break;
+                                case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
+                                    //if (!read && write) receivedGrantMessage = true;
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
-                }
-            }
-            catch { }
-            finally
-            {
-                grantManualEvent.Set();
-            }
-        }
-
-        void RevokeToSubKeyLevelCallback(string receivedMessage)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
-                {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
-                    {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-
-                        if (dictionary != null)
-                        {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
-                            {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
-                                {
-                                    bool read = Convert.ToBoolean(payload["r"]);
-                                    bool write = Convert.ToBoolean(payload["w"]);
-                                    string level = payload["level"].ToString();
-                                    if (level == "subkey")
-                                    {
-                                        switch (currentUnitTestCase)
-                                        {
-                                            case "ThenRevokeAtSubKeyLevelReturnSuccess":
-                                                if (!read && !write) receivedRevokeMessage = true;
-                                                break;
-                                            case "ThenSubKeyLevelWithReadShouldReturnSuccess":
-                                                //if (read && !write) receivedGrantMessage = true;
-                                                break;
-                                            case "ThenSubKeyLevelWithWriteShouldReturnSuccess":
-                                                //if (!read && write) receivedGrantMessage = true;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                    
-
                 }
             }
             catch { }
@@ -1028,47 +965,47 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void RevokeToChannelLevelCallback(string receivedMessage)
+        void RevokeToChannelLevelCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-
-                        if (dictionary != null)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            string level = receivedMessage.Payload.Level;
+                            Dictionary<string, GrantAck.Data.ChannelData> channels = receivedMessage.Payload.channels;
+                            if (channels != null && channels.Count > 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
+                                receivedRevokeMessage = true;
+                                foreach (string ch in channels.Keys)
                                 {
-                                    string level = payload["level"].ToString();
-                                    Dictionary<string, object> channels = (payload.ContainsKey("channels")) ? pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["channels"]) : null;
-                                    if (channels != null && channels.Count > 0)
+                                    if (channels.ContainsKey(ch))
                                     {
-                                        Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[currentChannel]);
-                                        if (channelContainer == null)
+                                        Dictionary<string, object> channelContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(channels[ch]);
+                                        if (channels[ch].Access != null)
                                         {
-                                            receivedRevokeMessage = true;
+                                            bool read = channels[ch].Access.read;
+                                            bool write = channels[ch].Access.write;
+                                            if (!read && !write)
+                                            {
+                                                receivedRevokeMessage = true;
+                                            }
+                                            break;
                                         }
-                                    }
-                                    else
-                                    {
-                                        receivedRevokeMessage = true;
                                     }
                                 }
                             }
+                            else
+                            {
+                                receivedRevokeMessage = true;
+                            }
                         }
                     }
-                    
-                    
                 }
             }
             catch { }
@@ -1078,38 +1015,36 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        void RevokeToUserLevelCallback(string receivedMessage)
+        void RevokeToUserLevelCallback(GrantAck receivedMessage)
         {
             try
             {
-                if (!string.IsNullOrEmpty(receivedMessage) && !string.IsNullOrEmpty(receivedMessage.Trim()))
+                if (receivedMessage != null)
                 {
-                    List<object> serializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(receivedMessage);
-                    if (serializedMessage != null && serializedMessage.Count > 0)
+                    int statusCode = receivedMessage.StatusCode;
+                    string statusMessage = receivedMessage.StatusMessage;
+                    if (statusCode == 200 && statusMessage.ToLower() == "success")
                     {
-                        Dictionary<string, object> dictionary = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(serializedMessage[0]);
-                        string currentChannel = serializedMessage[1].ToString();
-
-                        if (dictionary != null)
+                        if (receivedMessage.Payload != null)
                         {
-                            int statusCode = Convert.ToInt32(dictionary["status"]);
-                            string statusMessage = dictionary["message"].ToString();
-                            if (statusCode == 200 && statusMessage.ToLower() == "success")
+                            string level = receivedMessage.Payload.Level;
+                            Dictionary<string, GrantAck.Data.ChannelData> channelsDataDic = receivedMessage.Payload.channels;
+                            if (channelsDataDic != null && channelsDataDic.Count > 0)
                             {
-                                Dictionary<string, object> payload = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(dictionary["payload"]);
-                                if (payload != null && payload.Count > 0)
-                                {
-                                    string level = payload["level"].ToString();
-                                    string channel = payload["channel"].ToString();
+                                List<string> channelKeyList = channelsDataDic.Keys.ToList();
+                                string channel = channelKeyList[0];
 
-                                    Dictionary<string, object> auths = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(payload["auths"]);
-                                    if (auths != null && auths.Count >= 0)
+                                GrantAck.Data.ChannelData channelData = channelsDataDic[channel];
+                                if (channelData != null)
+                                {
+                                    Dictionary<string, GrantAck.Data.ChannelData.AuthData> authDataDic = channelData.auths;
+                                    if (authDataDic != null && authDataDic.Count > 0)
                                     {
                                         receivedRevokeMessage = true;
-                                        foreach (string key in auths.Keys)
+                                        foreach (string key in authDataDic.Keys)
                                         {
-                                            Dictionary<string, object> authKeyContainer = pubnub.JsonPluggableLibrary.ConvertToDictionaryObject(auths[key]);
-                                            if (authKeyContainer != null && authKeyContainer.Count >= 0)
+                                            GrantAck.Data.ChannelData.AuthData authData = authDataDic[key];
+                                            if (authData != null && authData.Access != null)
                                             {
                                                 receivedRevokeMessage = true;
                                                 break;
@@ -1120,11 +1055,10 @@ namespace PubNubMessaging.Tests
                                     {
                                         receivedRevokeMessage = false;
                                     }
-                                } //end of if payload
+                                }
                             }
-                        }
+                        } //end of if payload
                     }
-                    
                 }
             }
             catch { }

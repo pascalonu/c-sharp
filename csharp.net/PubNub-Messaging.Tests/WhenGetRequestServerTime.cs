@@ -33,7 +33,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -52,7 +52,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.PubnubUnitTest = unitTest;
 
-            pubnub.Time<string>(ReturnTimeStampCallback, DummyErrorCallback);
+            pubnub.Time(ReturnTimeStampCallback, DummyErrorCallback);
             mreTime.WaitOne(310 * 1000);
             pubnub.EndPendingRequests(); 
             pubnub.PubnubUnitTest = null;
@@ -82,7 +82,7 @@ namespace PubNubMessaging.Tests
             if (proxyConfigured)
             {
                 pubnub.Proxy = proxy;
-                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
                 mreProxy.WaitOne(310 * 1000);
                 pubnub.EndPendingRequests(); 
                 pubnub.PubnubUnitTest = null;
@@ -117,7 +117,7 @@ namespace PubNubMessaging.Tests
             if (proxyConfigured)
             {
                 pubnub.Proxy = proxy;
-                pubnub.Time<string>(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
+                pubnub.Time(ReturnProxyPresenceTimeStampCallback, DummyErrorCallback);
                 mreProxy.WaitOne(310 * 1000);
                 pubnub.EndPendingRequests(); 
                 pubnub.PubnubUnitTest = null;
@@ -132,38 +132,20 @@ namespace PubNubMessaging.Tests
         }
 
 
-        private void ReturnTimeStampCallback(string result)
+        private void ReturnTimeStampCallback(long result)
         {
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            if (result > 0)
             {
-                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
-                if (deserializedMessage != null && deserializedMessage.Count > 0)
-                {
-                    string time = deserializedMessage[0].ToString();
-                    Int64 nanoTime;
-                    if (time.Length > 2 && Int64.TryParse(time, out nanoTime))
-                    {
-                        timeReceived = true;
-                    }
-                }
+                timeReceived = true;
             }
             mreTime.Set();
         }
 
-        private void ReturnProxyPresenceTimeStampCallback(string result)
+        private void ReturnProxyPresenceTimeStampCallback(long result)
         {
-            if (!string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(result.Trim()))
+            if (result > 0)
             {
-                List<object> deserializedMessage = pubnub.JsonPluggableLibrary.DeserializeToListOfObject(result);
-                if (deserializedMessage != null && deserializedMessage.Count > 0)
-                {
-                    string time = deserializedMessage[0].ToString();
-                    Int64 nanoTime;
-                    if (time.Length > 2 && Int64.TryParse(time, out nanoTime))
-                    {
-                        timeReceivedWhenProxy = true;
-                    }
-                }
+                timeReceivedWhenProxy = true;
             }
             mreProxy.Set();
         }
