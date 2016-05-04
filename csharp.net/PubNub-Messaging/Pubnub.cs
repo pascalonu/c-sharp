@@ -452,24 +452,24 @@ namespace PubNubMessaging.Core
             return PubnubWin.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
-        public void SetInternalLogLevel(LoggingMethod.Level logLevel)  
-        {  
-            pubnub.PubnubLogLevel = logLevel;  
-        }  
+        //public void SetInternalLogLevel(LoggingMethod.Level logLevel)  
+        //{  
+        //    pubnub.PubnubLogLevel = logLevel;  
+        //}  
   
-        public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)  
-        {  
-            pubnub.PubnubErrorLevel = errorLevel;  
-        }  
+        //public void SetErrorFilterLevel(PubnubErrorFilter.Level errorLevel)  
+        //{  
+        //    pubnub.PubnubErrorLevel = errorLevel;  
+        //}  
 
 		#endregion
 
 		#region "Properties"
-		public string AuthenticationKey {
-			get {return pubnub.AuthenticationKey;}
-			set {pubnub.AuthenticationKey = value;}
-		}
 
+        public PNConfiguration Configuration
+        {
+            get { return pubnub.Configuration; }
+        }
 		public int LocalClientHeartbeatInterval {
 			get {return pubnub.LocalClientHeartbeatInterval;}
 			set {pubnub.LocalClientHeartbeatInterval = value;}
@@ -485,55 +485,11 @@ namespace PubNubMessaging.Core
 			set {pubnub.NetworkCheckMaxRetries = value;}
 		}
 
-		public int NonSubscribeTimeout {
-			get {return pubnub.NonSubscribeTimeout;}
-			set {pubnub.NonSubscribeTimeout = value;}
-		}
-
-		public int SubscribeTimeout {
-			get {return pubnub.SubscribeTimeout;}
-			set {pubnub.SubscribeTimeout = value;}
-		}
-
 		public bool EnableResumeOnReconnect {
 			get {return pubnub.EnableResumeOnReconnect;}
 			set {pubnub.EnableResumeOnReconnect = value;}
 		}
 
-		public string SessionUUID {
-			get {return pubnub.SessionUUID;}
-			set {pubnub.SessionUUID = value;}
-		}
-
-		public string Origin {
-			get {return pubnub.Origin;}
-			set {pubnub.Origin = value;}
-		}
-
-        public int PresenceHeartbeat
-        {
-            get
-            {
-                return pubnub.PresenceHeartbeat;
-            }
-            set
-            {
-                pubnub.PresenceHeartbeat = value;
-            }
-        }
-
-        public int PresenceHeartbeatInterval
-        {
-            get
-            {
-                return pubnub.PresenceHeartbeatInterval;
-            }
-            set
-            {
-                pubnub.PresenceHeartbeatInterval = value;
-            }
-        }
-        
         public IPubnubUnitTest PubnubUnitTest
 		{
 			get
@@ -647,20 +603,11 @@ namespace PubNubMessaging.Core
 
 		#region "Constructors"
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+		public Pubnub(PNConfiguration pnConfiguration)
 		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey, cipherKey, sslOn);
+            pubnub = new PubnubWin(pnConfiguration);
 		}
 
-		public Pubnub(string publishKey, string subscribeKey, string secretKey)
-		{
-			pubnub = new PubnubWin (publishKey, subscribeKey, secretKey);
-		}
-
-		public Pubnub(string publishKey, string subscribeKey)
-		{
-			pubnub = new PubnubWin (publishKey, subscribeKey);
-		}
 		#endregion
 	}
 }

@@ -1,4 +1,4 @@
-﻿//Build Date: Apr 26, 2016
+﻿//Build Date: May 04, 2016
 #region "Header"
 #if (UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_ANDROID || UNITY_IOS)
 #define USE_JSONFX_UNITY_IOS
@@ -82,7 +82,7 @@ namespace PubNubMessaging.Core
 		bool _enableJsonEncodingForPublish = true;
         bool _enableDebugForPushPublish = false;
 		LoggingMethod.Level _pubnubLogLevel = LoggingMethod.Level.Off;
-		PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
+		//PubnubErrorFilter.Level _errorLevel = PubnubErrorFilter.Level.Info;
 		protected ConcurrentDictionary<string, long> multiChannelSubscribe = new ConcurrentDictionary<string, long>();
         protected ConcurrentDictionary<string, long> multiChannelGroupSubscribe = new ConcurrentDictionary<string, long>();
 		ConcurrentDictionary<string, PubnubWebRequest> _channelRequest = new ConcurrentDictionary<string, PubnubWebRequest>();
@@ -114,6 +114,7 @@ namespace PubNubMessaging.Core
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
 		private string _origin = "pubsub.pubnub.com";
+        protected PNConfiguration pnConfiguration = null;
         protected string publishKey = "";
 		protected string subscribeKey = "";
 		protected string secretKey = "";
@@ -152,31 +153,13 @@ namespace PubNubMessaging.Core
             }
         }
 
-		internal int SubscribeTimeout 
+        public PNConfiguration Configuration
         {
-			get 
+            get
             {
-				return _pubnubWebRequestCallbackIntervalInSeconds;
-			}
-
-			set 
-            {
-				_pubnubWebRequestCallbackIntervalInSeconds = value;
-			}
-		}
-
-		internal int NonSubscribeTimeout 
-        {
-			get 
-            {
-				return _pubnubOperationTimeoutIntervalInSeconds;
-			}
-
-			set 
-            {
-				_pubnubOperationTimeoutIntervalInSeconds = value;
-			}
-		}
+                return pnConfiguration;
+            }
+        }
 
 		internal int NetworkCheckMaxRetries 
         {
@@ -255,19 +238,6 @@ namespace PubNubMessaging.Core
 
 		private string _authenticationKey = "";
 
-		public string AuthenticationKey 
-        {
-			get 
-            {
-				return _authenticationKey;
-			}
-
-			set 
-            {
-				_authenticationKey = value;
-			}
-		}
-
 		private IPubnubUnitTest _pubnubUnitTest;
 
 		public virtual IPubnubUnitTest PubnubUnitTest 
@@ -319,105 +289,35 @@ namespace PubNubMessaging.Core
             }
         }
 
-		public string Origin 
-        {
-			get 
-            {
-				return _origin;
-			}
-			
-            set 
-            {
-				_origin = value;
-			}
-		}
-
 		private string sessionUUID = "";
 
-		public string SessionUUID 
-        {
-			get 
-            {
-				return sessionUUID;
-			}
-			set 
-            {
-				sessionUUID = value;
-			}
-		}
-
-		/// <summary>
-		/// This property sets presence expiry timeout.
-		/// Presence expiry value in seconds.
-		/// </summary>
-		internal int PresenceHeartbeat 
-        {
-			get 
-            {
-				return _pubnubPresenceHeartbeatInSeconds;
-			}
+        //internal LoggingMethod.Level PubnubLogLevel 
+        //{
+        //    get 
+        //    {
+        //        return _pubnubLogLevel;
+        //    }
 			
-            set 
-            {
-				if (value <= 0 || value > 320) 
-                {
-					_pubnubPresenceHeartbeatInSeconds = 0;
-				} 
-                else 
-                {
-					_pubnubPresenceHeartbeatInSeconds = value;
-				}
-                if (_pubnubPresenceHeartbeatInSeconds != 0)
-                {
-                    _presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
-                }
-			}
-		}
+        //    set 
+        //    {
+        //        _pubnubLogLevel = value;
+        //        LoggingMethod.LogLevel = _pubnubLogLevel;
+        //    }
+        //}
 
-		internal int PresenceHeartbeatInterval 
-        {
-			get 
-            {
-				return _presenceHeartbeatIntervalInSeconds;
-			}
+        //internal PubnubErrorFilter.Level PubnubErrorLevel 
+        //{
+        //    get 
+        //    {
+        //        return _errorLevel;
+        //    }
 			
-            set 
-            {
-				_presenceHeartbeatIntervalInSeconds = value;
-                if (_presenceHeartbeatIntervalInSeconds >= _pubnubPresenceHeartbeatInSeconds) 
-                {
-					_presenceHeartbeatIntervalInSeconds = (_pubnubPresenceHeartbeatInSeconds / 2) - 1;
-				}
-			}
-		}
-
-		internal LoggingMethod.Level PubnubLogLevel 
-        {
-			get 
-            {
-				return _pubnubLogLevel;
-			}
-			
-            set 
-            {
-				_pubnubLogLevel = value;
-                LoggingMethod.LogLevel = _pubnubLogLevel;
-			}
-		}
-
-		internal PubnubErrorFilter.Level PubnubErrorLevel 
-        {
-			get 
-            {
-				return _errorLevel;
-			}
-			
-            set 
-            {
-				_errorLevel = value;
-                PubnubErrorFilter.ErrorLevel = _errorLevel;
-			}
-		}
+        //    set 
+        //    {
+        //        _errorLevel = value;
+        //        PubnubErrorFilter.ErrorLevel = _errorLevel;
+        //    }
+        //}
 
         public Collection<Uri> PushRemoteImageDomainUri
         {
@@ -468,7 +368,7 @@ namespace PubNubMessaging.Core
          * @param string secretKey.
          * @param bool sslOn
          */
-		protected virtual void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+		protected virtual void Init()
 		{
 			#if (USE_JSONFX) || (USE_JSONFX_UNITY)
 			LoggingMethod.WriteToLog ("USE_JSONFX", LoggingMethod.LevelInfo);
@@ -488,17 +388,6 @@ namespace PubNubMessaging.Core
 			#endif
             
             this.SubscribeMessageType = new PubnubSubscribeMessageType();
-
-			LoggingMethod.LogLevel = _pubnubLogLevel;
-			PubnubErrorFilter.ErrorLevel = _errorLevel;
-
-			this.publishKey = publishKey;
-			this.subscribeKey = subscribeKey;
-			this.secretKey = secretKey;
-			this.cipherKey = cipherKey;
-			this.ssl = sslOn;
-
-			VerifyOrSetSessionUUID();
 		}
 
 		#endregion
@@ -1035,7 +924,8 @@ namespace PubNubMessaging.Core
                                 PubnubPresenceChannelCallback currentPubnubCallback = callbackObject as PubnubPresenceChannelCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
-                                    state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    //state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    state.Request.Abort();
                                 }
                             }
                             else
@@ -1043,7 +933,8 @@ namespace PubNubMessaging.Core
                                 PubnubSubscribeChannelCallback<T> currentPubnubCallback = callbackObject as PubnubSubscribeChannelCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
-                                    state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    //state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    state.Request.Abort();
                                 }
                             }
                         }
@@ -1067,7 +958,8 @@ namespace PubNubMessaging.Core
                                 PubnubPresenceChannelGroupCallback currentPubnubCallback = callbackObject as PubnubPresenceChannelGroupCallback;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
-                                    state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    //state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    state.Request.Abort();
                                 }
                             }
                             else
@@ -1075,7 +967,8 @@ namespace PubNubMessaging.Core
                                 PubnubSubscribeChannelGroupCallback<T> currentPubnubCallback = callbackObject as PubnubSubscribeChannelGroupCallback<T>;
                                 if (currentPubnubCallback != null && currentPubnubCallback.ErrorCallback != null)
                                 {
-                                    state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    //state.Request.Abort(currentPubnubCallback.ErrorCallback, _errorLevel);
+                                    state.Request.Abort();
                                 }
                             }
                         }
@@ -1099,7 +992,8 @@ namespace PubNubMessaging.Core
 		private void TerminatePendingWebRequest(PubnubWebRequest request, Action<PubnubClientError> errorCallback)
 		{
 			if (request != null) {
-				request.Abort(errorCallback, _errorLevel);
+				//request.Abort(errorCallback, _errorLevel);
+                request.Abort();
 			}
 		}
 
@@ -1467,7 +1361,8 @@ namespace PubNubMessaging.Core
                 string multiChannel = (channels.Length > 0) ? string.Join(",", channels) : ",";
 				PubnubWebRequest request = (_channelRequest.ContainsKey (multiChannel)) ? _channelRequest [multiChannel] : null;
 				if (request != null) {
-					request.Abort (null, _errorLevel);
+					//request.Abort (null, _errorLevel);
+                    request.Abort();
 
 					LoggingMethod.WriteToLog (string.Format ("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString (), request.RequestUri.ToString ()), LoggingMethod.LevelInfo);
 				}
@@ -1531,46 +1426,32 @@ namespace PubNubMessaging.Core
          * @param string secretKey.
          * @param bool sslOn
          */
-		public PubnubCore (string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+		public PubnubCore (PNConfiguration pnConfiguation)
 		{
-            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
-            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
-            if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
-            if (IsNullOrWhiteSpace(cipherKey)) { cipherKey = ""; }
-            
-            this.Init(publishKey, subscribeKey, secretKey, cipherKey, sslOn);
-		}
+            if (pnConfiguation == null)
+            {
+                throw new ArgumentException("PNConfiguration missing");
+            }
 
-		/**
-         * PubNub 2.0 Compatibility
-         * 
-         * Prepare Pubnub messaging class initial state
-         * 
-         * @param string publishKey.
-         * @param string subscribeKey.
-         */
-		public PubnubCore (string publishKey, string subscribeKey)
-		{
-            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
-            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
-            
-            this.Init(publishKey, subscribeKey, "", "", true);
-		}
+            this.pnConfiguration = pnConfiguation;
 
-		/// <summary>
-		/// PubNub without SSL
-		/// Prepare Pubnub messaging class initial state
-		/// </summary>
-		/// <param name="publishKey"></param>
-		/// <param name="subscribeKey"></param>
-		/// <param name="secretKey"></param>
-		public PubnubCore (string publishKey, string subscribeKey, string secretKey)
-		{
-            if (IsNullOrWhiteSpace(publishKey)) { publishKey = ""; }
-            if (IsNullOrWhiteSpace(subscribeKey)) { subscribeKey = ""; }
-            if (IsNullOrWhiteSpace(secretKey)) { secretKey = ""; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.PublishKey)) { this.publishKey = pnConfiguation.PublishKey; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.SubscribeKey)) { this.subscribeKey = pnConfiguation.SubscribeKey; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.SecretKey)) { this.secretKey = pnConfiguation.SecretKey; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.CiperKey)) { this.cipherKey = pnConfiguation.CiperKey; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.AuthKey)) { this._authenticationKey = pnConfiguation.AuthKey; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.Origin)) { this._origin = pnConfiguation.Origin; }
+            if (!IsNullOrWhiteSpace(pnConfiguation.Uuid)) { this.sessionUUID = pnConfiguation.Uuid; }
+
+            this.ssl = pnConfiguation.Secure;
+            this._pubnubWebRequestCallbackIntervalInSeconds = pnConfiguation.SubscribeTimeout;
+            this._pubnubOperationTimeoutIntervalInSeconds = pnConfiguation.NonSubscribeRequestTimeout;
+            this._pubnubPresenceHeartbeatInSeconds = pnConfiguation.PresenceHeartbeatTimeout;
+            this._presenceHeartbeatIntervalInSeconds = pnConfiguation.PresenceHeartbeatInterval;
+
+            _pubnubLogLevel = pnConfiguation.LogVerbosity;
             
-            this.Init(publishKey, subscribeKey, secretKey, "", true);
+            this.Init();
 		}
 
         public static bool IsNullOrWhiteSpace(string value)
@@ -5701,18 +5582,6 @@ namespace PubNubMessaging.Core
             }
         }
 
-        //protected void GoToCallback<T> (object result, Action<T> Callback)
-        //{
-        //    if (Callback != null) {
-        //        if (typeof(T) == typeof(string)) {
-        //            JsonResponseToCallback (result, Callback);
-        //        } else {
-        //            //_jsonPluggableLibrary.DeserializeToObject<T>(result);
-        //            Callback ((T)(object)result);
-        //        }
-        //    }
-        //}
-
         protected void GoToCallback<T>(List<object> result, Action<T> Callback, bool internalObject, ResponseType type)
         {
             if (Callback != null)
@@ -5773,18 +5642,20 @@ namespace PubNubMessaging.Core
 		protected void GoToCallback(PubnubClientError error, Action<PubnubClientError> Callback)
 		{
 			if (Callback != null && error != null) {
-				if ((int)error.Severity <= (int)_errorLevel) { //Checks whether the error serverity falls in the range of error filter level
-					//Do not send 107 = PubnubObjectDisposedException
-					//Do not send 105 = WebRequestCancelled
-					//Do not send 130 = PubnubClientMachineSleep
-                    if (error.StatusCode != 107
-                        && error.StatusCode != 105
-                        && error.StatusCode != 130
-                        && error.StatusCode != 4040) //Error Code that should not go out
-                    { 
-						Callback (error);
-					}
-				}
+                //if ((int)error.Severity <= (int)_errorLevel) { //Checks whether the error serverity falls in the range of error filter level
+                //}
+
+                //Do not send 107 = PubnubObjectDisposedException
+                //Do not send 105 = WebRequestCancelled
+                //Do not send 130 = PubnubClientMachineSleep
+                if (error.StatusCode != 107
+                    && error.StatusCode != 105
+                    && error.StatusCode != 130
+                    && error.StatusCode != 4040) //Error Code that should not go out
+                {
+                    Callback(error);
+                }
+
 			}
 		}
 
@@ -10004,6 +9875,113 @@ namespace PubNubMessaging.Core
         public int TTL { get; set; }
         public string ChannelGroups { get; set; }
     }
+
+    public class PNConfiguration
+    {
+        private int _presenceHeartbeatTimeout;
+        private int _presenceHeartbeatInterval;
+        private string _uuid = "";
+
+        public string Origin { get; set; }
+
+        public int SubscribeTimeout { get; set; }
+
+        public int PresenceHeartbeatTimeout
+        {
+            get
+            {
+                return _presenceHeartbeatTimeout;
+            }
+        }
+
+        public int PresenceHeartbeatInterval
+        {
+            get
+            {
+                return _presenceHeartbeatInterval;
+            }
+        }
+
+        public bool Secure { get; set; }
+
+        public string SubscribeKey { get; set; }
+
+        public string PublishKey { get; set; }
+
+        public string SecretKey { get; set; }
+
+        public string CiperKey { get; set; }
+
+        public string AuthKey { get; set; }
+
+        public string Uuid 
+        {
+            get
+            {
+                return _uuid;
+            }
+            set
+            {
+                if (value != null && value.Trim().Length > 0)
+                {
+                    _uuid = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Missing or Incorrect Uuid value");
+                }
+            }
+        }
+
+        public LoggingMethod.Level LogVerbosity { get; set; }
+
+        public int ConnectTimeout { get; set; }
+
+        public int NonSubscribeRequestTimeout { get; set; }
+
+        public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
+
+        public string FilterExpression { get; set; }
+
+        public PNConfiguration()
+        {
+            this._presenceHeartbeatTimeout = 300;
+            this._uuid = Guid.NewGuid().ToString();
+            this.NonSubscribeRequestTimeout = 10;
+            this.SubscribeTimeout = 310;
+            this.ConnectTimeout = 5;
+            this.LogVerbosity = LoggingMethod.Level.Off;
+            this.Secure = true;
+        }
+
+        public PNConfiguration SetPresenceHeartbeatTimeoutWithCustomInterval(int timeout, int interval)
+        {
+            this._presenceHeartbeatTimeout = timeout;
+            this._presenceHeartbeatInterval = interval;
+
+            return this;
+        }
+        public PNConfiguration SetPresenceHeartbeatTimeout(int timeout)
+        {
+            this._presenceHeartbeatTimeout = timeout;
+
+            return SetPresenceHeartbeatTimeoutWithCustomInterval(timeout, (timeout / 2) - 1);
+        }
+    }
+
+    public enum PNHeartbeatNotificationOption
+    {
+        None,
+        Failures,
+        All
+    }
+
+    //public abstract class SubscribeCallback
+    //{
+    //    public abstract void status(Pubnub pubnub, PNStatus status);
+    //    public abstract void message(Pubnub pubnub, PNMessageResult message);
+    //    public abstract void presence(Pubnub pubnub, PNPresenceEventResult presence);
+    //}
     
     #endregion
 

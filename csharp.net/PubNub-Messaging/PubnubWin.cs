@@ -1,4 +1,4 @@
-﻿//Build Date: Mar 04, 2016
+﻿//Build Date: May 04, 2016
 using System;
 using System.Text;
 using System.IO;
@@ -92,20 +92,20 @@ namespace PubNubMessaging.Core
 		}
 #endif
 
-        public PubnubWin (string publishKey, string subscribeKey): 
-			base(publishKey, subscribeKey)
+        public PubnubWin (PNConfiguration pnConfiguration):
+            base(pnConfiguration)
 		{
 		}
 
-		public PubnubWin(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn): 
-			base(publishKey, subscribeKey, secretKey, cipherKey, sslOn)
-		{
-		}
+        //public PubnubWin(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn): 
+        //    base(publishKey, subscribeKey, secretKey, cipherKey, sslOn)
+        //{
+        //}
 
-		public PubnubWin(string publishKey, string subscribeKey, string secretKey):
-			base(publishKey, subscribeKey, secretKey)
-		{
-		}
+        //public PubnubWin(string publishKey, string subscribeKey, string secretKey):
+        //    base(publishKey, subscribeKey, secretKey)
+        //{
+        //}
 		#endregion
 
 		#region "Abstract methods"
@@ -163,7 +163,7 @@ namespace PubNubMessaging.Core
 		#endregion
 
 		#region "Overridden methods"
-		protected override sealed void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
+		protected override sealed void Init()
 		{
 
 			#if (USE_JSONFX)
@@ -183,27 +183,27 @@ namespace PubNubMessaging.Core
             LoggingMethod.LogLevel = pubnubLogLevel;
             PubnubErrorFilter.ErrorLevel = errorLevel;
 #else
-            string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
-            int logLevelValue;
-            if (!Int32.TryParse(configuredLogLevel, out logLevelValue))
-            {
-                base.PubnubLogLevel = pubnubLogLevel;
-            }
-            else
-            {
-                base.PubnubLogLevel = (LoggingMethod.Level)logLevelValue;
-            }
+            //string configuredLogLevel = ConfigurationManager.AppSettings["PubnubMessaging.LogLevel"];
+            //int logLevelValue;
+            //if (!Int32.TryParse(configuredLogLevel, out logLevelValue))
+            //{
+            //    base.PubnubLogLevel = pubnubLogLevel;
+            //}
+            //else
+            //{
+            //    base.PubnubLogLevel = (LoggingMethod.Level)logLevelValue;
+            //}
 
-            string configuredErrorFilter = ConfigurationManager.AppSettings["PubnubMessaging.PubnubErrorFilterLevel"];
-            int errorFilterValue;
-            if (!Int32.TryParse(configuredErrorFilter, out errorFilterValue))
-            {
-                base.PubnubErrorLevel = errorLevel;
-            }
-            else
-            {
-                base.PubnubErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
-            }
+            //string configuredErrorFilter = ConfigurationManager.AppSettings["PubnubMessaging.PubnubErrorFilterLevel"];
+            //int errorFilterValue;
+            //if (!Int32.TryParse(configuredErrorFilter, out errorFilterValue))
+            //{
+            //    base.PubnubErrorLevel = errorLevel;
+            //}
+            //else
+            //{
+            //    base.PubnubErrorLevel = (PubnubErrorFilter.Level)errorFilterValue;
+            //}
 #endif
 
 #if (SILVERLIGHT || WINDOWS_PHONE)
@@ -211,13 +211,13 @@ namespace PubNubMessaging.Core
             HttpWebRequest.RegisterPrefix("http://", WebRequestCreator.ClientHttp);
 #endif
 
-			base.publishKey = publishKey;
-			base.subscribeKey = subscribeKey;
-			base.secretKey = secretKey;
-			base.cipherKey = cipherKey;
-			base.ssl = sslOn;
+            //base.publishKey = publishKey;
+            //base.subscribeKey = subscribeKey;
+            //base.secretKey = secretKey;
+            //base.cipherKey = cipherKey;
+            //base.ssl = sslOn;
 
-			base.VerifyOrSetSessionUUID();
+            //base.VerifyOrSetSessionUUID();
 
 			//Initiate System Events for PowerModeChanged - to monitor suspend/resume
 			InitiatePowerModeCheck();
@@ -322,9 +322,10 @@ namespace PubNubMessaging.Core
                     presenceHeartbeatState.Request = null;
                     presenceHeartbeatState.Response = null;
 
-                    if (base.PresenceHeartbeatInterval > 0)
+                    int presenceHeartbeatInterval = base.pnConfiguration.PresenceHeartbeatInterval;
+                    if (presenceHeartbeatInterval > 0)
                     {
-                        presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, base.PresenceHeartbeatInterval * 1000, base.PresenceHeartbeatInterval * 1000);
+                        presenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, presenceHeartbeatInterval * 1000, presenceHeartbeatInterval * 1000);
                     }
                 }
             }

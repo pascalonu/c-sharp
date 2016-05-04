@@ -155,8 +155,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientNetworkStatus.cs" />
+    <Compile Include="Enum\PNOperationType.cs" />
+    <Compile Include="Enum\PNStatusCategory.cs" />
     <Compile Include="LoggingMethod.cs" />
     <Compile Include="MD5.cs" />
+    <Compile Include="Model\Consumer\PNErrorData.cs" />
+    <Compile Include="Model\Consumer\PNStatus.cs" />
     <Compile Include="Pubnub.cs" />
     <Compile Include="PubnubCore.cs" />
     <Compile Include="PubnubWin.cs" />
