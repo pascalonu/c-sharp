@@ -49,6 +49,29 @@
       ]
     },
 
+    "wpa8.1": {
+      "buildOptions": { "define": [ "WP81" ] },
+      "frameworkAssemblies": {
+        "Microsoft.CSharp": "",
+        "System": "",
+        "System.Core": "",
+        "mscorlib": ""
+      },
+      "dependencies": {
+        "System.ComponentModel": "4.0.0",
+        "System.Collections": "4.0.0",
+        "System.Reflection.Primitives": "4.0.0",
+        "System.Reflection.Extensions": "4.0.0",
+        "Microsoft.Net.Http": "2.2.29",
+        "System.Runtime": "4.0.10",
+        "System.Net.Primitives": "4.0.0",
+        "System.Net.Requests": "4.0.0",
+        "Portable.BouncyCastle-Signed": "1.7.0.2",
+        "System.Threading": "4.0.0",
+        "System.Threading.Timer": "4.0.0"
+      }
+    },
+
     "uap10.0": {
       "dependencies": {
         "System.Collections": "4.0.11-rc2-24027",
