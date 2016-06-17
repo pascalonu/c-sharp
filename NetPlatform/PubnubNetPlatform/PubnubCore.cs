@@ -647,6 +647,16 @@ namespace PubNubMessaging.Core
                         if (channelGroup != "" && channelGroupInternetStatus.ContainsKey(channelGroup)
                                  && (netState.Type == ResponseType.Subscribe || netState.Type == ResponseType.Presence))
                         {
+                            bool networkConnection;
+                            if (_pubnubUnitTest is IPubnubUnitTest && _pubnubUnitTest.EnableStubTest)
+                            {
+                                networkConnection = true;
+                            }
+                            else
+                            {
+                                networkConnection = CheckInternetConnectionStatus<T>(pubnetSystemActive, netState.ErrorCallback, netState.Channels, netState.ChannelGroups);
+                            }
+
                             if (channelGroupInternetStatus[channelGroup])
                             {
                                 //Reset Retry if previous state is true
@@ -654,6 +664,8 @@ namespace PubNubMessaging.Core
                             }
                             else
                             {
+                                channelGroupInternetStatus.AddOrUpdate(channelGroup, networkConnection, (key, oldValue) => networkConnection);
+
                                 channelGroupInternetRetry.AddOrUpdate(channelGroup, 1, (key, oldValue) => oldValue + 1);
                                 LoggingMethod.WriteToLog(string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retry {3} of {4}", DateTime.Now.ToString(), channelGroup, netState.Type, channelGroupInternetRetry[channelGroup], _pubnubNetworkCheckRetries), LoggingMethod.LevelInfo);
 
@@ -3252,7 +3264,7 @@ namespace PubNubMessaging.Core
                 channelGroupInternetStatus.AddOrUpdate(multiChannelGroup, networkConnection, (key, oldValue) => networkConnection);
             }
 
-            if (((channelInternetStatus.ContainsKey(multiChannel) && !channelInternetStatus[multiChannel])
+            if (((multiChannel != "," && channelInternetStatus.ContainsKey(multiChannel) && !channelInternetStatus[multiChannel])
                 || (multiChannelGroup != "" && channelGroupInternetStatus.ContainsKey(multiChannelGroup) && !channelGroupInternetStatus[multiChannelGroup]))
                 && pubnetSystemActive) 
             {
