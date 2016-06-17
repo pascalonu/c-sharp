@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true
@@ -11,7 +11,7 @@
     },
     "Newtonsoft.Json": "9.0.1-beta1",
     "NUnitLite": "3.2.1",
-    "PubNub-Messaging": "1.0.0",
+    "PubnubNetPlatform": "3.7.6-rc1",
     "System.Reflection": "4.1.0-rc2-24027",
     "System.Threading.Thread": "4.0.0-rc2-24027"
   },
