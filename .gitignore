@@ -65,11 +65,11 @@
 /NetPlatform/*.userprefs
 /NetPlatform/.vs/*.dg
 /NetPlatform/packages/*
-/NetPlatform/PubNub-Messaging/*.user
-/NetPlatform/PubNub-Messaging/bin/Debug/*
-/NetPlatform/PubNub-Messaging/obj/Debug/*
-/NetPlatform/PubNub-Messaging/bin/Release/*
-/NetPlatform/PubNub-Messaging/obj/Release/*
+/NetPlatform/PubnubNetPlatform/*.user
+/NetPlatform/PubnubNetPlatform/bin/Debug/*
+/NetPlatform/PubnubNetPlatform/obj/Debug/*
+/NetPlatform/PubnubNetPlatform/bin/Release/*
+/NetPlatform/PubnubNetPlatform/obj/Release/*
 /NetPlatform/PubNub-Messaging.Tests/*.user
 /NetPlatform/PubNub-Messaging.Tests/bin/Debug/*
 /NetPlatform/PubNub-Messaging.Tests/obj/Debug/*

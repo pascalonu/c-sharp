@@ -7,13 +7,13 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PubNub_Messaging")]
+[assembly: AssemblyProduct("PubnubNetPlatform")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+//[assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3441e2da-5042-4b83-a5bc-0182aba391a6")]
+//// The following GUID is for the ID of the typelib if this project is exposed to COM
+//[assembly: Guid("befd6d28-a56d-447b-9d7f-2eceb0ca5f60")]

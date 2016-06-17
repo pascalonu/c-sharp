@@ -9,53 +9,56 @@ using System.Reflection;
 using System.Linq;
 
 using System.Threading.Tasks;
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
 using System.Security.Cryptography;
-//using Org.BouncyCastle.Crypto;
-//using Org.BouncyCastle.Crypto.Digests;
-//using Org.BouncyCastle.Crypto.Parameters;
-//using Org.BouncyCastle.Crypto.Engines;
-//using Org.BouncyCastle.Crypto.Modes;
-//using Org.BouncyCastle.Crypto.Generators;
-//using Org.BouncyCastle.Crypto.Paddings;
-//using Org.BouncyCastle.Security;
+#else
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Security;
+#endif
 
 namespace PubNubMessaging.Core
 {
 	internal class PubnubWin : PubnubCore
 	{
 
-		#region "Constants"
+#region "Constants"
 		LoggingMethod.Level pubnubLogLevel = LoggingMethod.Level.Off;
 		PubnubErrorFilter.Level errorLevel = PubnubErrorFilter.Level.Info;
 
-		#if (!SILVERLIGHT && !WINDOWS_PHONE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE)
 		protected bool pubnubEnableProxyConfig = true;
-		#endif
+#endif
 		
-		#if (__MonoCS__)
+#if (__MonoCS__)
 		protected string _domainName = "pubsub.pubnub.com";
-		#endif
+#endif
 
         private object _reconnectFromSuspendMode = null;
 
-		#endregion
+#endregion
 
-		#region "Properties"
+#region "Properties"
 		//Proxy
 		private PubnubProxy _pubnubProxy = null;
 		public PubnubProxy Proxy
 		{
 			get
 			{
-		        #if (!SILVERLIGHT && !WINDOWS_PHONE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE)
                 return _pubnubProxy;
-                #else
+#else
                 throw new NotSupportedException("Proxy is not supported");
-                #endif
+#endif
             }
 			set
 			{
-                #if (!SILVERLIGHT && !WINDOWS_PHONE)
+#if (!SILVERLIGHT && !WINDOWS_PHONE)
                 _pubnubProxy = value;
 				if (_pubnubProxy == null)
 				{
@@ -66,14 +69,14 @@ namespace PubNubMessaging.Core
 					_pubnubProxy = null;
 					throw new MissingMemberException("Insufficient Proxy Details");
 				}
-                #else
+#else
                 throw new NotSupportedException("Proxy is not supported");
-                #endif
+#endif
 			}
 		}
-		#endregion
+#endregion
 
-		#region "Constructors and destructors"
+#region "Constructors and destructors"
 
 #if (!SILVERLIGHT && !WINDOWS_PHONE && !MONOTOUCH && !__IOS__ && !MONODROID && !__ANDROID__ && !UNITY_STANDALONE && !UNITY_WEBPLAYER && !UNITY_IOS && !UNITY_ANDROID && !NETFX_CORE)
 //        ~PubnubWin()
@@ -97,9 +100,9 @@ namespace PubNubMessaging.Core
 			base(publishKey, subscribeKey, secretKey)
 		{
 		}
-		#endregion
+#endregion
 
-		#region "Abstract methods"
+#region "Abstract methods"
 		protected override PubnubWebRequest SetServicePointSetTcpKeepAlive (PubnubWebRequest request)
         {
 #if ((!__MonoCS__) && (!SILVERLIGHT) && !WINDOWS_PHONE && !NETFX_CORE)
@@ -151,22 +154,22 @@ namespace PubNubMessaging.Core
             return;
         }
 
-		#endregion
+#endregion
 
-		#region "Overridden methods"
+#region "Overridden methods"
 		protected override sealed void Init(string publishKey, string subscribeKey, string secretKey, string cipherKey, bool sslOn)
 		{
 
-			#if (USE_JSONFX)
+#if (USE_JSONFX)
 			LoggingMethod.WriteToLog("Using USE_JSONFX", LoggingMethod.LevelInfo);
 			this.JsonPluggableLibrary = new JsonFXDotNet();
-			#elif (USE_DOTNET_SERIALIZATION)
+#elif (USE_DOTNET_SERIALIZATION)
 			LoggingMethod.WriteToLog("Using USE_DOTNET_SERIALIZATION", LoggingMethod.LevelInfo);
 			this.JsonPluggableLibrary = new JscriptSerializer();   
-			#else
+#else
 			LoggingMethod.WriteToLog("Using NewtonsoftJsonDotNet", LoggingMethod.LevelInfo);
 			base.JsonPluggableLibrary = new NewtonsoftJsonDotNet();
-			#endif
+#endif
 
 			base.PubnubLogLevel = pubnubLogLevel;
 			base.PubnubErrorLevel = errorLevel;
@@ -203,6 +206,32 @@ namespace PubNubMessaging.Core
 
         protected override void ForceCanonicalPathAndQuery (Uri requestUri)
         {
+#if NETFX_CORE
+            if (base.PubnubUnitTest != null && base.PubnubUnitTest is IPubnubUnitTest)
+            {
+                // Force canonical path and query
+                string paq = requestUri.PathAndQuery;
+
+                IEnumerable<FieldInfo> ienumFlagsFieldInfo = from p in typeof(Uri).GetRuntimeFields()
+                                                             where (p.Name == "m_Flags")
+                                                             select (FieldInfo)p;
+
+                if (ienumFlagsFieldInfo != null)
+                {
+                    FieldInfo[] arrFieldInfo = ienumFlagsFieldInfo.ToArray();
+                    if (arrFieldInfo.Length > 0)
+                    {
+                        FieldInfo flagsFieldInfo = arrFieldInfo[0];
+                        if (flagsFieldInfo != null)
+                        {
+                            ulong flags = (ulong)flagsFieldInfo.GetValue(requestUri);
+                            flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
+                            flagsFieldInfo.SetValue(requestUri, flags);
+                        }
+                    }
+                }
+            }
+#elif !PORTABLE151 && !PORTABLE259 && !PORTABLE136
             LoggingMethod.WriteToLog("Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), LoggingMethod.LevelInfo);
             FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
             if (flagsFieldInfo != null)
@@ -211,9 +240,10 @@ namespace PubNubMessaging.Core
                 flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
                 flagsFieldInfo.SetValue(requestUri, flags);
             }
-		}
+#endif
+        }
 
-		protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
+        protected override sealed void SendRequestAndGetResult<T> (Uri requestUri, RequestState<T> pubnubRequestState, PubnubWebRequest request)
         {
 #if (SILVERLIGHT || WINDOWS_PHONE || NETFX_CORE)
             //For WP7, Ensure that the RequestURI length <= 1599
@@ -847,9 +877,9 @@ namespace PubNubMessaging.Core
             }
         }
 
-		#endregion
+#endregion
 
-		#region "Overridden properties"
+#region "Overridden properties"
 		public override IPubnubUnitTest PubnubUnitTest
 		{
 			get
@@ -861,9 +891,9 @@ namespace PubNubMessaging.Core
 				base.PubnubUnitTest = value;
 			}
 		}
-		#endregion
+#endregion
 
-		#region "Other methods"
+#region "Other methods"
 
 		private void InitiatePowerModeCheck()
         {
@@ -956,7 +986,7 @@ namespace PubNubMessaging.Core
 //		}
 #endif
 
-#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS) 
+#if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
 //		string CreateRequest(Uri requestUri)
 //		{
 //			StringBuilder requestBuilder = new StringBuilder();
@@ -1341,7 +1371,7 @@ namespace PubNubMessaging.Core
 		}
 #endif
 
-#if(UNITY_ANDROID || MONOTOUCH || __IOS__)      
+#if (UNITY_ANDROID || MONOTOUCH || __IOS__)
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1361,7 +1391,7 @@ namespace PubNubMessaging.Core
 		}
 #endif
 
-#if(MONODROID || __ANDROID__)      
+#if (MONODROID || __ANDROID__)
 		/// <summary>
 		/// Workaround for the bug described here 
 		/// https://bugzilla.xamarin.com/show_bug.cgi?id=6501
@@ -1411,9 +1441,9 @@ namespace PubNubMessaging.Core
 		}
 #endif
 
-        #endregion
+#endregion
 
-        #region "Nested Classes"
+#region "Nested Classes"
 #if (__MonoCS__ && !UNITY_ANDROID && !UNITY_IOS)
 //		class StateObject<T>
 //		{
@@ -1432,12 +1462,12 @@ namespace PubNubMessaging.Core
 //			public string requestString = null;
 //		}
 #endif
-        #endregion
+#endregion
 
     }
 
 
-    #region "PubnubWebRequestCreator"
+#region "PubnubWebRequestCreator"
     internal class PubnubWebRequestCreator : PubnubWebRequestCreatorBase
     {
 
@@ -1487,9 +1517,9 @@ namespace PubNubMessaging.Core
         }
 
     }
-    #endregion
+#endregion
 
-    #region "PubnubWebRequest"
+#region "PubnubWebRequest"
     public class PubnubWebRequest : PubnubWebRequestBase
     {
 
@@ -1586,9 +1616,9 @@ namespace PubNubMessaging.Core
 #endif
         }
     }
-    #endregion
+#endregion
 
-    #region "PubnubWebResponse"
+#region "PubnubWebResponse"
     public class PubnubWebResponse : PubnubWebResponseBase
     {
         public PubnubWebResponse(WebResponse response):base(response)
@@ -1607,19 +1637,19 @@ namespace PubNubMessaging.Core
         {
         }
 
-        #if !NETFX_CORE
+#if !NETFX_CORE
 //		public override void Close ()
 //		{
 //			if (response != null) {
 //				response.Close ();
 //			}
 //		}
-        #endif
+#endif
 
     }
-    #endregion
+#endregion
 
-    #region "PubnubCrypto"
+#region "PubnubCrypto"
 
     public class PubnubCrypto : PubnubCryptoBase
     {
@@ -1630,10 +1660,19 @@ namespace PubNubMessaging.Core
 
         protected override string ComputeHashRaw(string input)
         {
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
             HashAlgorithm algorithm = SHA256.Create();
-            Byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
             Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
             return BitConverter.ToString(hashedBytes);
+#else
+            Sha256Digest algorithm = new Sha256Digest();
+			Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
+			Byte[] bufferBytes = new byte[algorithm.GetDigestSize()];
+			algorithm.BlockUpdate(inputBytes, 0, inputBytes.Length);
+			algorithm.DoFinal(bufferBytes, 0);
+			return BitConverter.ToString(bufferBytes);
+#endif
         }
 
         protected override string EncryptOrDecrypt(bool type, string plainStr)
@@ -1642,37 +1681,78 @@ namespace PubNubMessaging.Core
             byte[] cipherText = null;
 
             //Set up
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
             Aes aesAlg = Aes.Create();
             aesAlg.KeySize = 256;
             aesAlg.BlockSize = 128;
             aesAlg.Mode = CipherMode.CBC;
             aesAlg.Padding = PaddingMode.PKCS7;
-            aesAlg.IV = System.Text.Encoding.ASCII.GetBytes("0123456789012345");
-            aesAlg.Key = System.Text.Encoding.ASCII.GetBytes(GetEncryptionKey());
+            aesAlg.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+            aesAlg.Key = System.Text.Encoding.UTF8.GetBytes(GetEncryptionKey());
+#else
+            string keyString = GetEncryptionKey();   
+
+			string input = plainStr;
+			byte[] inputBytes;
+			byte[] iv = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+			byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes (keyString);
+
+			//Set up
+			AesEngine engine = new AesEngine();
+			CbcBlockCipher blockCipher = new CbcBlockCipher(engine); //CBC
+			PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher); //Default scheme is PKCS5/PKCS7
+			KeyParameter keyParam = new KeyParameter(keyBytes);
+			ParametersWithIV keyParamWithIV = new ParametersWithIV(keyParam, iv, 0, iv.Length);
+#endif
 
             if (type)
             {
-                plainStr = EncodeNonAsciiCharacters(plainStr);
                 // Encrypt
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
+                plainStr = EncodeNonAsciiCharacters(plainStr);
                 ICryptoTransform crypto = aesAlg.CreateEncryptor();
-                byte[] plainText = Encoding.ASCII.GetBytes(plainStr);
+                byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
 
-                //encrypt
                 cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
 
                 return Convert.ToBase64String(cipherText);
+#else
+                input = EncodeNonAsciiCharacters(input);
+				inputBytes = Encoding.UTF8.GetBytes(input);            
+				cipher.Init(true, keyParamWithIV);
+				byte[] outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
+				int length = cipher.ProcessBytes(inputBytes, outputBytes, 0);
+				cipher.DoFinal(outputBytes, length); //Do the final block
+				string encryptedInput = Convert.ToBase64String(outputBytes);
+
+				return encryptedInput;
+#endif
             }
             else
             {
-                string decrypted = "";
                 try
                 {
                     //decode
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
+                    string decrypted = "";
                     byte[] decryptedBytes = Convert.FromBase64CharArray(plainStr.ToCharArray(), 0, plainStr.Length);
                     ICryptoTransform decrypto = aesAlg.CreateDecryptor();
-                    //decrypt                    
-                    decrypted = System.Text.Encoding.ASCII.GetString(decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length));
+                    //decrypt    
+                    var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
+                    decrypted = System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
                     return decrypted;
+#else
+                    inputBytes = Convert.FromBase64CharArray(input.ToCharArray(), 0, input.Length);            
+					cipher.Init(false, keyParamWithIV);
+					byte[] encryptedBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
+					int encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
+					int numOfOutputBytes = cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
+					//string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, encryptedBytes.Length);
+					int len = Array.IndexOf(encryptedBytes, (byte)0);
+					len = (len == -1) ? encryptedBytes.Length : len;
+					string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, len);
+					return actualInput;
+#endif
                 }
                 catch (Exception ex)
                 {
@@ -1686,9 +1766,9 @@ namespace PubNubMessaging.Core
 
     }
 
-    #endregion
+#endregion
 
-    #region "MPNS Toast/Tiles"
+#region "MPNS Toast/Tiles"
     
     public class MpnsToastNotification
     {
@@ -1738,7 +1818,7 @@ namespace PubNubMessaging.Core
         public string wide_content_3 = "";
     }
     
-    #endregion
+#endregion
 
 
 

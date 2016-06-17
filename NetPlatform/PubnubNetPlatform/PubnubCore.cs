@@ -39,22 +39,22 @@ using Newtonsoft.Json.Linq;
 namespace PubNubMessaging.Core
 {
 	// INotifyPropertyChanged provides a standard event for objects to notify clients that one of its properties has changed
-	internal abstract class PubnubCore : INotifyPropertyChanged
+	internal abstract class PubnubCore
 	{
 
 		#region "Events"
 
 		// Common property changed event
-		public event PropertyChangedEventHandler PropertyChanged;
+		//public event PropertyChangedEventHandler PropertyChanged;
 
-		public void RaisePropertyChanged(string propertyName)
-		{
-			var handler = PropertyChanged;
-			if (handler != null) 
-            {
-				handler(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
+		//public void RaisePropertyChanged(string propertyName)
+		//{
+		//	var handler = PropertyChanged;
+		//	if (handler != null) 
+  //          {
+		//		handler(this, new PropertyChangedEventArgs(propertyName));
+		//	}
+		//}
 
 		#endregion
 
@@ -98,7 +98,7 @@ namespace PubNubMessaging.Core
         // History of Messages (Obsolete)
 		private List<object> _history = new List<object>();
 
-        public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
+        //public List<object> History { get { return _history; } set { _history = value; RaisePropertyChanged("History"); } }
 
 		private static long lastSubscribeTimetoken = 0;
 		// Pubnub Core API implementation
@@ -6531,18 +6531,18 @@ namespace PubNubMessaging.Core
                                 }
                             }
 							break;
-						case ResponseType.History:
-							if (this.cipherKey.Length > 0) {
-								List<object> historyDecrypted = new List<object> ();
-								PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
-								foreach (object message in result) {
-									historyDecrypted.Add (aes.Decrypt (message.ToString ()));
-								}
-								History = historyDecrypted;
-							} else {
-								History = result;
-							}
-							break;
+						//case ResponseType.History:
+						//	if (this.cipherKey.Length > 0) {
+						//		List<object> historyDecrypted = new List<object> ();
+						//		PubnubCrypto aes = new PubnubCrypto (this.cipherKey);
+						//		foreach (object message in result) {
+						//			historyDecrypted.Add (aes.Decrypt (message.ToString ()));
+						//		}
+						//		History = historyDecrypted;
+						//	} else {
+						//		History = result;
+						//	}
+						//	break;
 						case ResponseType.DetailedHistory:
 							result = DecodeDecryptLoop (result, channels, channelGroups, errorCallback);
 							result.Add (multiChannel);

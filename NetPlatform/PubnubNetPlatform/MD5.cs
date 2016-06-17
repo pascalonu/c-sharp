@@ -3,14 +3,19 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
-//using Org.BouncyCastle.Crypto;
-//using Org.BouncyCastle.Crypto.Parameters;
-//using Org.BouncyCastle.Security;
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
 using System.Security.Cryptography;
+#else
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
+#endif
+
+
 
 namespace PubNubMessaging.Core
 {
-	#region "Crypto"
+#region "Crypto"
 
 	/// <summary>
 	/// MD5 Service provider
@@ -62,8 +67,8 @@ namespace PubNubMessaging.Core
 			return new MD5();
 		}
 
-		#region base implementation of the MD5
-		#region constants
+#region base implementation of the MD5
+#region constants
 		private const byte S11 = 7;
 		private const byte S12 = 12;
 		private const byte S13 = 17;
@@ -88,9 +93,9 @@ namespace PubNubMessaging.Core
 			0, 0, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		};
-		#endregion
+#endregion
 
-		#region F, G, H and I are basic MD5 functions.
+#region F, G, H and I are basic MD5 functions.
 		static private uint F(uint x, uint y, uint z)
 		{
 			return (((x) & (y)) | ((~x) & (z)));
@@ -107,9 +112,9 @@ namespace PubNubMessaging.Core
 		{
 			return ((y) ^ ((x) | (~z)));
 		}
-		#endregion
+#endregion
 
-		#region rotates x left n bits.
+#region rotates x left n bits.
 		/// <summary>
 		/// rotates x left n bits.
 		/// </summary>
@@ -120,9 +125,9 @@ namespace PubNubMessaging.Core
 		{
 			return (((x) << (n)) | ((x) >> (32 - (n))));
 		}
-		#endregion
+#endregion
 
-		#region FF, GG, HH, and II transformations
+#region FF, GG, HH, and II transformations
 		/// FF, GG, HH, and II transformations 
 		/// for rounds 1, 2, 3, and 4.
 		/// Rotation is separate from addition to prevent re-computation.
@@ -150,9 +155,9 @@ namespace PubNubMessaging.Core
 			(a) = ROTATE_LEFT((a), (s));
 			(a) += (b);
 		}
-		#endregion
+#endregion
 
-		#region context info
+#region context info
 		/// <summary>
 		/// state (ABCD)
 		/// </summary>
@@ -167,7 +172,7 @@ namespace PubNubMessaging.Core
 		/// input buffer
 		/// </summary>
 		byte[] buffer = new byte[64];
-		#endregion
+#endregion
 
 		internal MD5()
 		{
@@ -405,9 +410,9 @@ namespace PubNubMessaging.Core
 				output[i] = ((uint)input[j]) | (((uint)input[j + 1]) << 8) | (((uint)input[j + 2]) << 16) | (((uint)input[j + 3]) <<
 				                                                                                             24);
 		}
-		#endregion
+#endregion
 
-		#region expose the same interface as the regular MD5 object
+#region expose the same interface as the regular MD5 object
 
 		protected byte[] HashValue;
 		protected int State;
@@ -559,7 +564,7 @@ namespace PubNubMessaging.Core
 			this.State = 0;
 			return buffer;
 		}
-		#endregion
+#endregion
 
 		protected virtual void Dispose(bool disposing)
 		{
@@ -637,11 +642,11 @@ namespace PubNubMessaging.Core
 		/*private static byte[] Md5(string cipherKey)
 		{
 			MD5 obj = new MD5CryptoServiceProvider();
-			#if (SILVERLIGHT || WINDOWS_PHONE)
+#if (SILVERLIGHT || WINDOWS_PHONE)
 			byte[] data = Encoding.UTF8.GetBytes(cipherKey);
-			#else
+#else
 			byte[] data = Encoding.Default.GetBytes(cipherKey);
-			#endif
+#endif
 			return obj.ComputeHash(data);
 		}*/
 
@@ -672,9 +677,9 @@ namespace PubNubMessaging.Core
 		/// </param>
 		protected string EncodeNonAsciiCharacters(string value)
 		{
-			#if (USE_JSONFX || USE_JSONFX_FOR_UNITY)
+#if (USE_JSONFX || USE_JSONFX_FOR_UNITY)
 			value = ConvertHexToUnicodeChars(value);
-			#endif
+#endif
 
 			StringBuilder sb = new StringBuilder();
 			foreach (char c in value)
@@ -702,15 +707,27 @@ namespace PubNubMessaging.Core
             byte[] keyByte = encoding.GetBytes(secret);
             byte[] messageBytes = encoding.GetBytes(message);
 
+#if !PORTABLE259 && !PORTABLE151 && !PORTABLE136
             using (var hmacsha256 = new HMACSHA256(keyByte))
             {
                 byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
                 return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
             }
-		}
+#else
+            //http://mycsharp.de/wbb2/thread.php?postid=3550104
+            KeyParameter paramKey = new KeyParameter(keyByte);
+			IMac mac = MacUtilities.GetMac("HMac-SHA256");
+			mac.Init(paramKey);
+			mac.Reset();
+			mac.BlockUpdate(messageBytes, 0, messageBytes.Length);
+			byte[] hashmessage = new byte[mac.GetMacSize()];
+			mac.DoFinal(hashmessage, 0);
+			return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
+#endif
+        }
 
 
-	}
-	#endregion
+    }
+#endregion
 }
 

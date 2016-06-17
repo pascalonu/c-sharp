@@ -100,8 +100,11 @@ namespace PubNubMessaging.Core
 			state.Channels = channels;
             state.ChannelGroups = channelGroups;
 
+#if !PORTABLE151 && !PORTABLE259
             ThreadPool.QueueUserWorkItem(CheckSocketConnect<T>, state);
-
+#else
+            CheckSocketConnect<T>(state);
+#endif
             mres.WaitOne(500);
 
 		}
@@ -233,6 +236,6 @@ namespace PubNubMessaging.Core
 		}
 
 	}
-	#endregion
+#endregion
 }
 
